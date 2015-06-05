@@ -1,0 +1,6 @@
+/*! \group NetNeurons
+    \title NetNeurons
+    \target NetNeurons
+
+    C++ interfaces to run a multilayered perceptron.
+*/
