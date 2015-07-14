@@ -24,13 +24,17 @@
 template <typename T> class Matrix
 {
 public:
+    /* Constructors & destructor */
     inline Matrix() : data(NULL) {}
     Matrix(const Matrix<T> &other);
     inline Matrix(int m, int n, T *data);
     Matrix(int m, int n);
     Matrix(int m, int n, T value);
     inline ~Matrix();
+    /* Trivial information */
     inline bool isValid() const;
+    inline const T &operator()(const quint16 &i, const quint16 &j) const;
+    inline T &operator()(const quint16 &i, const quint16 &j);
 private:
     T *data; // data[i * n + j] for the i-th row, j-th column
     int m, n; // m rows, n columns
@@ -92,6 +96,18 @@ template <typename T> inline Matrix<T>::~Matrix()
 template <typename T> inline bool Matrix<T>::isValid() const
 {
     return (bool) data;
+}
+
+template <typename T> inline const T &Matrix<T>::operator()(const quint16 &i, const quint16 &j) const
+{
+    ASSERT(data && (i >= 0) && (i < m) && (j >= 0) && (j < n));
+    return data[i * n + j];
+}
+
+template <typename T> inline T &Matrix<T>::operator()(const quint16 &i, const quint16 &j)
+{
+    ASSERT(data && (i >= 0) && (i < m) && (j >= 0) && (j < n));
+    return data[i * n + j];
 }
 
 #endif // MATRIX_H

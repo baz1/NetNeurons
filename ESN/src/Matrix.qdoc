@@ -55,10 +55,25 @@
     Destructs the matrix.
 */
 
-
 /*!
     \fn bool Matrix<T>::isValid() const
 
     Returns \c true if this matrix is valid, \c false otherwise.
+*/
+
+/*!
+    \fn const T &operator()(const quint16 &i, const quint16 &j) const
+
+    Returns the value in the matrix at row \a i and column \a j as a const reference.
+
+    \warning indexes start at 0.
+*/
+
+/*!
+    \fn T &operator()(const quint16 &i, const quint16 &j)
+
+    Returns the value in the matrix at row \a i and column \a j as a modifiable reference.
+
+    \warning indexes start at 0.
 */
 
