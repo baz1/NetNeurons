@@ -31,15 +31,17 @@ public:
     Matrix(int m, int n);
     Matrix(int m, int n, T value = 0);
     inline ~Matrix();
-    /* Trivial information */
+    /* Trivial operations */
     inline bool isValid() const;
     inline const T &operator()(const quint16 &i, const quint16 &j) const;
     inline T &operator()(const quint16 &i, const quint16 &j);
     inline const T* constData() const { return _data; }
     inline T* data() { return data; }
-    /* Trivial operations */
-    fill(T value = 0);
-    inline fillZero();
+    void fill(T value = 0);
+    inline void fillZero();
+    inline int countRows() const { return _data ? _m : 0; }
+    inline int countCols() const { return _data ? _n : 0; }
+    void addIdentity();
 private:
     T *_data; // data[i * _n + j] for the i-th row, j-th column
     int _m, _n; // _m rows, _n columns
@@ -115,7 +117,7 @@ template <typename T> inline T &Matrix<T>::operator()(const quint16 &i, const qu
     return _data[i * _n + j];
 }
 
-template <typename T> Matrix<T>::fill(T value)
+template <typename T> void Matrix<T>::fill(T value)
 {
     ASSERT(_data);
     size_t size = _m * _n;
@@ -123,10 +125,21 @@ template <typename T> Matrix<T>::fill(T value)
         _data[--size] = value;
 }
 
-template <typename T> inline Matrix<T>::fillZero()
+template <typename T> inline void Matrix<T>::fillZero()
 {
     ASSERT(_data);
     memset((void*) _data, 0, _m * _n * sizeof(T));
+}
+
+template <typename T> void Matrix<T>::addIdentity()
+{
+    ASSERT(_data);
+    ASSERT_INT(((unsigned long long) _n) + 1);
+    int min = (_m < _n) ? _m : _n, step = _n + 1;
+    ASSERT_INT(((unsigned long long) min) * ((unsigned long long) step));
+    min *= step;
+    while (min)
+        data[min -= step] += 1;
 }
 
 #endif // MATRIX_H

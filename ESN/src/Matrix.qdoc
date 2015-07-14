@@ -4,6 +4,8 @@
     \ingroup NetNeurons
 
     \brief This class allows you to manipulate matrices in any field you wish.
+    
+    Note that the field \c T that is used must implement a conversion from type int.
 */
 
 /*!
@@ -94,7 +96,7 @@
 */
 
 /*!
-    \fn Matrix<T>::fill(T value)
+    \fn void Matrix<T>::fill(T value)
 
     Fills the matrix with the value \a value.
 
@@ -102,9 +104,29 @@
 */
 
 /*!
-    \fn Matrix<T>::fillZero()
+    \fn void Matrix<T>::fillZero()
 
     Fills the matrix with zero-data.
+
+    \warning Assumes that the matrix is valid.
+*/
+
+/*!
+    \fn int Matrix<T>::countRows() const
+
+    Returns the number of rows of the matrix, or 0 if the matrix is invalid.
+*/
+
+/*!
+    \fn int Matrix<T>::countCols() const
+
+    Returns the number of columns of the matrix, or 0 if the matrix is invalid.
+*/
+
+/*!
+    \fn void Matrix<T>::addIdentity() const
+
+    Adds a diagonal of 1s to the matrix, ending at the minimal dimension.
 
     \warning Assumes that the matrix is valid.
 */
