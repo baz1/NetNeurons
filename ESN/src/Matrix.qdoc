@@ -11,13 +11,13 @@
 /*!
     \fn Matrix<T>::Matrix()
 
-    Constructs a new invalid matrix.
+    Constructs a new null matrix.
 */
 
 /*!
     \fn Matrix<T>::Matrix(const Matrix<T> &other)
 
-    Constructs a \underline deep copy of the matrix \a other.
+    Constructs a shallow copy of the matrix \a other.
 */
 
 /*!
@@ -31,7 +31,7 @@
     been allocated with \c new, should contain at least \tt {m*n} elements
     and must not be freed: the matrix destructor will do the deletion.
 
-    \note If \a data is null, this will create an invalid matrix.
+    \note If \a data is null, this will create a null matrix.
 */
 
 /*!
@@ -40,7 +40,7 @@
     Constructs a matrix with size \a m times \a n initialized with zero-data
     (corresponds to real zeros for all the primitive types in C).
 
-    \note If \tt {(m<=0)||(n<=0)}, this will create an invalid matrix.
+    \note If \tt {(m<=0)||(n<=0)}, this will create a null matrix.
 */
 
 /*!
@@ -48,7 +48,7 @@
     
     Constructs a matrix with size \a m times \a n initialized with the value \a value everywhere.
 
-    \note If \tt {(m<=0)||(n<=0)}, this will create an invalid matrix.
+    \note If \tt {(m<=0)||(n<=0)}, this will create a null matrix.
 */
 
 /*!
@@ -58,9 +58,9 @@
 */
 
 /*!
-    \fn bool Matrix<T>::isValid() const
+    \fn bool Matrix<T>::isNull() const
 
-    Returns \c true if this matrix is valid, \c false otherwise.
+    Returns \c true if this matrix is null, \c false otherwise.
 */
 
 /*!
@@ -68,6 +68,7 @@
 
     Returns the value in the matrix at row \a i and column \a j as a const reference.
 
+    \warning Assumes that the matrix is not null.
     \warning indexes start at 0.
 */
 
@@ -76,6 +77,7 @@
 
     Returns the value in the matrix at row \a i and column \a j as a modifiable reference.
 
+    \warning Assumes that the matrix is not null.
     \warning indexes start at 0.
 */
 
@@ -84,7 +86,7 @@
 
     Returns a const reference to the internal data.
 
-    \warning Do not access the data concurrently with some non-const operation on the matrix, nor after its destruction.
+    \warning Use with caution!
 */
 
 /*!
@@ -100,7 +102,7 @@
 
     Fills the matrix with the value \a value.
 
-    \warning Assumes that the matrix is valid.
+    \warning Assumes that the matrix is not null.
 */
 
 /*!
@@ -108,19 +110,19 @@
 
     Fills the matrix with zero-data.
 
-    \warning Assumes that the matrix is valid.
+    \warning Assumes that the matrix is not null.
 */
 
 /*!
     \fn int Matrix<T>::countRows() const
 
-    Returns the number of rows of the matrix, or 0 if the matrix is invalid.
+    Returns the number of rows of the matrix, or 0 if the matrix is null.
 */
 
 /*!
     \fn int Matrix<T>::countCols() const
 
-    Returns the number of columns of the matrix, or 0 if the matrix is invalid.
+    Returns the number of columns of the matrix, or 0 if the matrix is null.
 */
 
 /*!
@@ -128,14 +130,12 @@
 
     Adds a diagonal of 1s to the matrix, ending at the minimal dimension.
 
-    \warning Assumes that the matrix is valid.
+    \warning Assumes that the matrix is not null.
 */
 
 /*!
     \fn Matrix<T> &Matrix<T>::operator=(const Matrix<T> &other)
 
     Assigns the value of \a other to this matrix and returns a reference to it.
-
-    \note This function is linear in terms of the number of elements in the matrix.
 */
 

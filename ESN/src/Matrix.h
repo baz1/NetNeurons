@@ -7,169 +7,153 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
-#include <string.h>
-
-#ifdef QT_VERSION
-  #include <QtGlobal>
-  #define ASSERT(x) Q_ASSERT(x)
-#else
-  #define ASSERT(x) (void) 0
-  #ifndef NULL
-    #define NULL ((void*) 0)
-  #endif
-#endif
-
-#define ASSERT_INT(x) ASSERT((x) < (1ULL << (sizeof(int) * 8 - 1)))
+#include "StaticMatrix.h"
 
 template <typename T> class Matrix
 {
 public:
     /* Constructors & destructor */
-    inline Matrix() : _data(NULL) {}
-    Matrix(const Matrix<T> &other);
+    inline Matrix() : _p(NULL) {}
+    inline Matrix(const Matrix<T> &other);
     inline Matrix(int m, int n, T *_data);
     Matrix(int m, int n);
-    Matrix(int m, int n, T value = 0);
+    Matrix(int m, int n, T value);
     inline ~Matrix();
     /* Trivial operations */
-    inline bool isValid() const;
+    inline bool isNull() const;
     inline const T &operator()(const quint16 &i, const quint16 &j) const;
     inline T &operator()(const quint16 &i, const quint16 &j);
-    inline const T* constData() const { return _data; }
-    inline T* data() { return data; }
+    inline const T* constData() const { return _p ? _p->d->constData() : NULL; }
+    inline T* data() { detach(); return _p ? _p->d->data() : NULL; }
     void fill(T value = 0);
     inline void fillZero();
-    inline int countRows() const { return _data ? _m : 0; }
-    inline int countCols() const { return _data ? _n : 0; }
+    inline int countRows() const { return _p ? _p->d->countRows() : 0; }
+    inline int countCols() const { return _p ? _p->d->countCols() : 0; }
     void addIdentity();
     /* Mathematical operators */
     Matrix<T> &operator=(const Matrix<T> &other);
 private:
-    T *_data; // data[i * _n + j] for the i-th row, j-th column
-    int _m, _n; // _m rows, _n columns
+    void deref();
+    void detach();
+private:
+    struct Data
+    {
+        StaticMatrix<T> *d;
+        int n;
+        inline Data(StaticMatrix<T> *d) : d(d), n(1) {}
+    };
+    Data *_p;
 };
 
-template <typename T> Matrix<T>::Matrix(const Matrix<T> &other) : _m(other._m), _n(other._n), _data(NULL)
+template <typename T> inline Matrix<T>::Matrix(const Matrix<T> &other)
 {
-    if (other._data)
-    {
-        ASSERT((_m > 0) && (_n > 0));
-        ASSERT_INT(((unsigned long long) _m) * ((unsigned long long) _n));
-        size_t size = _m * _n;
-        _data = new T[size];
-        memcpy((void*) _data, (void*) other._data, size * sizeof(T));
-    }
+    _p = other._p;
+    if (_p)
+        ++_p->n;
 }
 
-template <typename T> inline Matrix<T>::Matrix(int m, int n, T *data) : _m(m), _n(n), _data(data)
+template <typename T> inline Matrix<T>::Matrix(int m, int n, T *data)
 {
     if (data)
     {
-        ASSERT((m > 0) && (n > 0));
-        ASSERT_INT(((unsigned long long) m) * ((unsigned long long) n));
+        _p = new Data(new StaticMatrix<T>(m, n, data));
+    } else {
+        _p = NULL;
     }
 }
 
-template <typename T> Matrix<T>::Matrix(int m, int n) : _m(m), _n(n), _data(NULL)
+template <typename T> Matrix<T>::Matrix(int m, int n)
 {
     if ((m > 0) && (n > 0))
     {
-        ASSERT_INT(((unsigned long long) m) * ((unsigned long long) n));
-        size_t size = m * n;
-        _data = new T[size];
-        memset((void*) _data, 0, size * sizeof(T));
+        _p = new Data(new StaticMatrix<T>(m, n));
+    } else {
+        _p = NULL;
     }
 }
 
-template <typename T> Matrix<T>::Matrix(int m, int n, T value) : _m(m), _n(n), _data(NULL)
+template <typename T> Matrix<T>::Matrix(int m, int n, T value)
 {
     if ((m > 0) && (n > 0))
     {
-        ASSERT_INT(((unsigned long long) m) * ((unsigned long long) n));
-        size_t size = m * n;
-        _data = new T[size];
-        while (size)
-            _data[--size] = value;
+        _p = new Data(new StaticMatrix<T>(m, n, value));
+    } else {
+        _p = NULL;
     }
 }
 
 template <typename T> inline Matrix<T>::~Matrix()
 {
-    if (_data)
-    {
-        ASSERT((_m > 0) && (_n > 0));
-        delete[] _data;
-    }
+    deref();
 }
 
-template <typename T> inline bool Matrix<T>::isValid() const
+template <typename T> inline bool Matrix<T>::isNull() const
 {
-    return (bool) _data;
+    return !_p;
 }
 
 template <typename T> inline const T &Matrix<T>::operator()(const quint16 &i, const quint16 &j) const
 {
-    ASSERT(_data && (i >= 0) && (i < _m) && (j >= 0) && (j < _n));
-    return _data[i * _n + j];
+    ASSERT(_p);
+    return (*_p->d)(i, j);
 }
 
 template <typename T> inline T &Matrix<T>::operator()(const quint16 &i, const quint16 &j)
 {
-    ASSERT(_data && (i >= 0) && (i < _m) && (j >= 0) && (j < _n));
-    return _data[i * _n + j];
+    detach();
+    ASSERT(_p);
+    return (*_p->d)(i, j);
 }
 
 template <typename T> void Matrix<T>::fill(T value)
 {
-    ASSERT(_data);
-    size_t size = _m * _n;
-    while (size)
-        _data[--size] = value;
+    detach();
+    ASSERT(_p);
+    _p->d->fill(value);
 }
 
 template <typename T> inline void Matrix<T>::fillZero()
 {
-    ASSERT(_data);
-    memset((void*) _data, 0, _m * _n * sizeof(T));
+    detach();
+    ASSERT(_p);
+    _p->d->fillZero();
 }
 
 template <typename T> void Matrix<T>::addIdentity()
 {
-    ASSERT(_data);
-    ASSERT_INT(((unsigned long long) _n) + 1);
-    int min = (_m < _n) ? _m : _n, step = _n + 1;
-    ASSERT_INT(((unsigned long long) min) * ((unsigned long long) step));
-    min *= step;
-    while (min)
-        data[min -= step] += 1;
+    detach();
+    ASSERT(_p);
+    _p->d->addIdentity();
 }
 
 template <typename T> Matrix<T> &Matrix<T>::operator=(const Matrix<T> &other)
 {
-    if (other._data)
+    deref();
+    _p = other._p;
+    if (_p)
+        ++_p->n;
+    return *this;
+}
+
+template <typename T> void Matrix<T>::deref()
+{
+    if (_p)
     {
-        ASSERT((other._m > 0) && (other._n > 0));
-        ASSERT_INT(((unsigned long long) other._m) * ((unsigned long long) other._n));
-        size_t size = other._m * other._n;
-        if ((!_data) || (_m != other._m) || (_n != other._n))
+        if (--_p->n <= 0)
         {
-            _m = other._m;
-            _n = other._n;
-            if (_data)
-                delete[] _data;
-            _data = new T[size];
+            delete _p->d;
+            delete _p;
         }
-        while (size)
-        {
-            --size;
-            _data[size] = other._data[size];
-        }
-    } else {
-        if (_data)
-        {
-            delete[] _data;
-            _data = NULL;
-        }
+        _p = NULL;
+    }
+}
+
+template <typename T> void Matrix<T>::detach()
+{
+    if (_p && (_p->n > 1))
+    {
+        --_p->n;
+        _p = new Data(new StaticMatrix<T>(*_p->d));
     }
 }
 
