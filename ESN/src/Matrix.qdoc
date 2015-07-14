@@ -77,3 +77,19 @@
     \warning indexes start at 0.
 */
 
+/*!
+    \fn const T* constData() const
+
+    Returns a const reference to the internal data.
+
+    \warning Do not access the data concurrently with some non-const operation on the matrix, nor after its destruction.
+*/
+
+/*!
+    \fn T* constData()
+
+    Returns a modifiable reference to the internal data.
+
+    \warning Use with caution!
+*/
+

@@ -25,9 +25,9 @@ template <typename T> class Matrix
 {
 public:
     /* Constructors & destructor */
-    inline Matrix() : data(NULL) {}
+    inline Matrix() : _data(NULL) {}
     Matrix(const Matrix<T> &other);
-    inline Matrix(int m, int n, T *data);
+    inline Matrix(int m, int n, T *_data);
     Matrix(int m, int n);
     Matrix(int m, int n, T value);
     inline ~Matrix();
@@ -35,24 +35,26 @@ public:
     inline bool isValid() const;
     inline const T &operator()(const quint16 &i, const quint16 &j) const;
     inline T &operator()(const quint16 &i, const quint16 &j);
+    inline const T* constData() const { return _data; }
+    inline T* data() { return data; }
 private:
-    T *data; // data[i * n + j] for the i-th row, j-th column
-    int m, n; // m rows, n columns
+    T *_data; // data[i * _n + j] for the i-th row, j-th column
+    int _m, _n; // _m rows, _n columns
 };
 
-template <typename T> Matrix<T>::Matrix(const Matrix<T> &other) : m(other.m), n(other.n), data(NULL)
+template <typename T> Matrix<T>::Matrix(const Matrix<T> &other) : _m(other._m), _n(other._n), _data(NULL)
 {
-    if (other.data)
+    if (other._data)
     {
-        ASSERT((m > 0) && (n > 0));
-        ASSERT_INT(((unsigned long long) m) * ((unsigned long long) n));
-        size_t size = m * n;
-        data = new T[size];
-        memcpy((void*) data, (void*) other.data, size * sizeof(T));
+        ASSERT((_m > 0) && (_n > 0));
+        ASSERT_INT(((unsigned long long) _m) * ((unsigned long long) _n));
+        size_t size = _m * _n;
+        _data = new T[size];
+        memcpy((void*) _data, (void*) other._data, size * sizeof(T));
     }
 }
 
-template <typename T> inline Matrix<T>::Matrix(int m, int n, T *data) : m(m), n(n), data(data)
+template <typename T> inline Matrix<T>::Matrix(int m, int n, T *data) : _m(m), _n(n), _data(data)
 {
     if (data)
     {
@@ -61,53 +63,53 @@ template <typename T> inline Matrix<T>::Matrix(int m, int n, T *data) : m(m), n(
     }
 }
 
-template <typename T> Matrix<T>::Matrix(int m, int n) : m(m), n(n), data(NULL)
+template <typename T> Matrix<T>::Matrix(int m, int n) : _m(m), _n(n), _data(NULL)
 {
     if ((m > 0) && (n > 0))
     {
         ASSERT_INT(((unsigned long long) m) * ((unsigned long long) n));
         size_t size = m * n;
-        data = new T[size];
-        memset((void*) data, 0, size * sizeof(T));
+        _data = new T[size];
+        memset((void*) _data, 0, size * sizeof(T));
     }
 }
 
-template <typename T> Matrix<T>::Matrix(int m, int n, T value) : m(m), n(n), data(NULL)
+template <typename T> Matrix<T>::Matrix(int m, int n, T value) : _m(m), _n(n), _data(NULL)
 {
     if ((m > 0) && (n > 0))
     {
         ASSERT_INT(((unsigned long long) m) * ((unsigned long long) n));
         size_t size = m * n;
-        data = new T[size];
+        _data = new T[size];
         while (size)
-            data[--size] = value;
+            _data[--size] = value;
     }
 }
 
 template <typename T> inline Matrix<T>::~Matrix()
 {
-    if (data)
+    if (_data)
     {
-        ASSERT((m > 0) && (n > 0));
-        delete[] data;
+        ASSERT((_m > 0) && (_n > 0));
+        delete[] _data;
     }
 }
 
 template <typename T> inline bool Matrix<T>::isValid() const
 {
-    return (bool) data;
+    return (bool) _data;
 }
 
 template <typename T> inline const T &Matrix<T>::operator()(const quint16 &i, const quint16 &j) const
 {
-    ASSERT(data && (i >= 0) && (i < m) && (j >= 0) && (j < n));
-    return data[i * n + j];
+    ASSERT(_data && (i >= 0) && (i < _m) && (j >= 0) && (j < _n));
+    return _data[i * _n + j];
 }
 
 template <typename T> inline T &Matrix<T>::operator()(const quint16 &i, const quint16 &j)
 {
-    ASSERT(data && (i >= 0) && (i < m) && (j >= 0) && (j < n));
-    return data[i * n + j];
+    ASSERT(_data && (i >= 0) && (i < _m) && (j >= 0) && (j < _n));
+    return _data[i * _n + j];
 }
 
 #endif // MATRIX_H
