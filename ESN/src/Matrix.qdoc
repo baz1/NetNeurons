@@ -131,3 +131,11 @@
     \warning Assumes that the matrix is valid.
 */
 
+/*!
+    \fn Matrix<T> &Matrix<T>::operator=(const Matrix<T> &other)
+
+    Assigns the value of \a other to this matrix and returns a reference to it.
+
+    \note This function is linear in terms of the number of elements in the matrix.
+*/
+

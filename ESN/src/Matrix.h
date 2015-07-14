@@ -42,6 +42,8 @@ public:
     inline int countRows() const { return _data ? _m : 0; }
     inline int countCols() const { return _data ? _n : 0; }
     void addIdentity();
+    /* Mathematical operators */
+    Matrix<T> &operator=(const Matrix<T> &other);
 private:
     T *_data; // data[i * _n + j] for the i-th row, j-th column
     int _m, _n; // _m rows, _n columns
@@ -140,6 +142,35 @@ template <typename T> void Matrix<T>::addIdentity()
     min *= step;
     while (min)
         data[min -= step] += 1;
+}
+
+template <typename T> Matrix<T> &Matrix<T>::operator=(const Matrix<T> &other)
+{
+    if (other._data)
+    {
+        ASSERT((other._m > 0) && (other._n > 0));
+        ASSERT_INT(((unsigned long long) other._m) * ((unsigned long long) other._n));
+        size_t size = other._m * other._n;
+        if ((!_data) || (_m != other._m) || (_n != other._n))
+        {
+            _m = other._m;
+            _n = other._n;
+            if (_data)
+                delete[] _data;
+            _data = new T[size];
+        }
+        while (size)
+        {
+            --size;
+            _data[size] = other._data[size];
+        }
+    } else {
+        if (_data)
+        {
+            delete[] _data;
+            _data = NULL;
+        }
+    }
 }
 
 #endif // MATRIX_H
