@@ -8,19 +8,57 @@
 
 /*!
     \fn Matrix<T>::Matrix()
-    
+
     Constructs a new invalid matrix.
 */
 
 /*!
     \fn Matrix<T>::Matrix(const Matrix<T> &other)
-    
+
     Constructs a \underline deep copy of the matrix \a other.
 */
 
 /*!
-    \fn Matrix<T>::~Matrix()
+    \fn Matrix<T>::Matrix(int m, int n, T *data)
     
+    Constructs a matrix from its data, \a m being the number of rows,
+    \a n the number of columns and \a data the value of the matrix,
+    \tt {data[i*n+j]} being the value at the i-th row, j-th column.
+
+    \warning the value \a data passed to this function should have
+    been allocated with \c new, should contain at least \tt {m*n} elements
+    and must not be freed: the matrix destructor will do the deletion.
+
+    \note If \a data is null, this will create an invalid matrix.
+*/
+
+/*!
+    \fn Matrix<T>::Matrix(int m, int n)
+    
+    Constructs a matrix with size \a m times \a n initialized with zero-memory
+    (corresponds to real zeros for all the primitive types in C).
+
+    \note If \tt {(m<=0)||(n<=0)}, this will create an invalid matrix.
+*/
+
+/*!
+    \fn Matrix<T>::Matrix(int m, int n, T value)
+    
+    Constructs a matrix with size \a m times \a n initialized with the value \a value everywhere.
+
+    \note If \tt {(m<=0)||(n<=0)}, this will create an invalid matrix.
+*/
+
+/*!
+    \fn Matrix<T>::~Matrix()
+
     Destructs the matrix.
+*/
+
+
+/*!
+    \fn bool Matrix<T>::isValid() const
+
+    Returns \c true if this matrix is valid, \c false otherwise.
 */
 
