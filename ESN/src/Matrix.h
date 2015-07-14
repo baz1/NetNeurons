@@ -29,7 +29,7 @@ public:
     Matrix(const Matrix<T> &other);
     inline Matrix(int m, int n, T *_data);
     Matrix(int m, int n);
-    Matrix(int m, int n, T value);
+    Matrix(int m, int n, T value = 0);
     inline ~Matrix();
     /* Trivial information */
     inline bool isValid() const;

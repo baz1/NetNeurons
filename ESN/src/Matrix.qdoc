@@ -62,7 +62,7 @@
 */
 
 /*!
-    \fn const T &operator()(const quint16 &i, const quint16 &j) const
+    \fn const T &Matrix<T>::operator()(const quint16 &i, const quint16 &j) const
 
     Returns the value in the matrix at row \a i and column \a j as a const reference.
 
@@ -70,7 +70,7 @@
 */
 
 /*!
-    \fn T &operator()(const quint16 &i, const quint16 &j)
+    \fn T &Matrix<T>::operator()(const quint16 &i, const quint16 &j)
 
     Returns the value in the matrix at row \a i and column \a j as a modifiable reference.
 
@@ -78,7 +78,7 @@
 */
 
 /*!
-    \fn const T* constData() const
+    \fn const T* Matrix<T>::constData() const
 
     Returns a const reference to the internal data.
 
@@ -86,7 +86,7 @@
 */
 
 /*!
-    \fn T* constData()
+    \fn T* Matrix<T>::data()
 
     Returns a modifiable reference to the internal data.
 
