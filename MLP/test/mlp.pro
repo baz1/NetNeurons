@@ -8,7 +8,7 @@ QT       += core
 
 QT       -= gui
 
-TARGET = neurons
+TARGET = mlp
 CONFIG   += console
 CONFIG   -= app_bundle
 
