@@ -37,6 +37,9 @@ public:
     inline T &operator()(const quint16 &i, const quint16 &j);
     inline const T* constData() const { return _data; }
     inline T* data() { return data; }
+    /* Trivial operations */
+    fill(T value = 0);
+    inline fillZero();
 private:
     T *_data; // data[i * _n + j] for the i-th row, j-th column
     int _m, _n; // _m rows, _n columns
@@ -110,6 +113,20 @@ template <typename T> inline T &Matrix<T>::operator()(const quint16 &i, const qu
 {
     ASSERT(_data && (i >= 0) && (i < _m) && (j >= 0) && (j < _n));
     return _data[i * _n + j];
+}
+
+template <typename T> Matrix<T>::fill(T value)
+{
+    ASSERT(_data);
+    size_t size = _m * _n;
+    while (size)
+        _data[--size] = value;
+}
+
+template <typename T> inline Matrix<T>::fillZero()
+{
+    ASSERT(_data);
+    memset((void*) _data, 0, _m * _n * sizeof(T));
 }
 
 #endif // MATRIX_H

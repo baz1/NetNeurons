@@ -35,7 +35,7 @@
 /*!
     \fn Matrix<T>::Matrix(int m, int n)
     
-    Constructs a matrix with size \a m times \a n initialized with zero-memory
+    Constructs a matrix with size \a m times \a n initialized with zero-data
     (corresponds to real zeros for all the primitive types in C).
 
     \note If \tt {(m<=0)||(n<=0)}, this will create an invalid matrix.
@@ -91,5 +91,21 @@
     Returns a modifiable reference to the internal data.
 
     \warning Use with caution!
+*/
+
+/*!
+    \fn Matrix<T>::fill(T value)
+
+    Fills the matrix with the value \a value.
+
+    \warning Assumes that the matrix is valid.
+*/
+
+/*!
+    \fn Matrix<T>::fillZero()
+
+    Fills the matrix with zero-data.
+
+    \warning Assumes that the matrix is valid.
 */
 
