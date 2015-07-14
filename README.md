@@ -4,6 +4,13 @@ This project includes several implementations of artificial neural networks.
 This library being very lightweight, the source files should be directly included
 in any project that uses them. The Makefile only exists to generate the documentation.
 
+## ESN - Echo State Network
+
+### Presentation
+
+Echo State Networks are a type of recurrent neural network.
+This library enables a basic usage of this type of networks.
+
 ## MLP - MultiLayered Perceptron
 
 ### Presentation
