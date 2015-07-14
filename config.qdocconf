@@ -55,8 +55,8 @@ HTML.footer = \
     "   </div>\n" \
     "</div>\n"
 
-headerdirs = ./MLP/src .
+headerdirs = ./MLP/src ./ESN/src .
 
-sourcedirs = ./MLP/src .
+sourcedirs = ./MLP/src ./ESN/src .
 
 outputdir = doc

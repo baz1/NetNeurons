@@ -1,0 +1,26 @@
+/*!
+    \class Matrix
+    \inmodule NetNeurons
+    \ingroup NetNeurons
+
+    \brief This class allows you to manipulate matrices in any field you wish.
+*/
+
+/*!
+    \fn Matrix<T>::Matrix()
+    
+    Constructs a new invalid matrix.
+*/
+
+/*!
+    \fn Matrix<T>::Matrix(const Matrix<T> &other)
+    
+    Constructs a \underline deep copy of the matrix \a other.
+*/
+
+/*!
+    \fn Matrix<T>::~Matrix()
+    
+    Destructs the matrix.
+*/
+
