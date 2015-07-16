@@ -43,6 +43,7 @@ public:
     /* Mathematical operators */
     StaticMatrix<T> &operator=(const StaticMatrix<T> &other);
     bool operator==(const StaticMatrix<T> &other) const;
+    inline bool operator!=(const StaticMatrix<T> &other) const { return !((*this) == other); }
 private:
     T *_data; // data[i * _n + j] for the i-th row, j-th column
     int _m, _n; // _m rows, _n columns

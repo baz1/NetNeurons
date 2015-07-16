@@ -147,6 +147,17 @@ template <typename T> bool Matrix<T>::operator==(const Matrix<T> &other) const
     return !(_p || other._p);
 }
 
+template <typename T> bool Matrix<T>::operator!=(const Matrix<T> &other) const
+{
+    if (_p && other._p)
+    {
+        if (_p == other._p)
+            return false;
+        return !((*_p->d) == (*other._p->d));
+    }
+    return _p || other._p;
+}
+
 template <typename T> void Matrix<T>::deref()
 {
     if (_p)
