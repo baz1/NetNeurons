@@ -33,6 +33,7 @@ public:
     /* Mathematical operators */
     Matrix<T> &operator=(const Matrix<T> &other);
     bool operator==(const Matrix<T> &other) const;
+    bool operator!=(const Matrix<T> &other) const;
 private:
     void deref();
     void detach();

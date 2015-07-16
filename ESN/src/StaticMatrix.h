@@ -9,6 +9,8 @@
 
 #include <string.h>
 
+#define MATRIX_MEM_CMP 0
+
 #ifdef QT_VERSION
   #include <QtGlobal>
   #define ASSERT(x) Q_ASSERT(x)
@@ -155,7 +157,18 @@ template <typename T> bool StaticMatrix<T>::operator==(const StaticMatrix<T> &ot
     ASSERT(_data && other._data);
     if ((_m != other._m) || (_n != other._n))
         return false;
+#if MATRIX_MEM_CMP
     return memcmp((const void*) _data, (const void*) other._data, ((size_t) (_n * _m)) * sizeof(T)) == 0;
+#else
+    size_t size = other._m * other._n;
+    while (size)
+    {
+        --size;
+        if (_data[size] != other._data[size])
+            return false;
+    }
+    return true;
+#endif
 }
 
 #endif // STATICMATRIX_H
