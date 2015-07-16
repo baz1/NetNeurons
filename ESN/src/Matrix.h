@@ -32,6 +32,7 @@ public:
     void addIdentity();
     /* Mathematical operators */
     Matrix<T> &operator=(const Matrix<T> &other);
+    bool operator==(const Matrix<T> &other) const;
 private:
     void deref();
     void detach();
@@ -133,6 +134,17 @@ template <typename T> Matrix<T> &Matrix<T>::operator=(const Matrix<T> &other)
     if (_p)
         ++_p->n;
     return *this;
+}
+
+template <typename T> bool Matrix<T>::operator==(const Matrix<T> &other) const
+{
+    if (_p && other._p)
+    {
+        if (_p == other._p)
+            return true;
+        return (*_p->d) == (*other._p->d);
+    }
+    return !(_p || other._p);
 }
 
 template <typename T> void Matrix<T>::deref()

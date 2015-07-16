@@ -42,6 +42,7 @@ public:
     inline void addIdentity();
     /* Mathematical operators */
     StaticMatrix<T> &operator=(const StaticMatrix<T> &other);
+    bool operator==(const StaticMatrix<T> &other) const;
 private:
     T *_data; // data[i * _n + j] for the i-th row, j-th column
     int _m, _n; // _m rows, _n columns
@@ -85,11 +86,9 @@ template <typename T> inline StaticMatrix<T>::StaticMatrix(int m, int n, T value
 
 template <typename T> inline StaticMatrix<T>::~StaticMatrix()
 {
-    if (_data)
-    {
-        ASSERT((_m > 0) && (_n > 0));
-        delete[] _data;
-    }
+    ASSERT(_data);
+    ASSERT((_m > 0) && (_n > 0));
+    delete[] _data;
 }
 
 template <typename T> inline const T &StaticMatrix<T>::operator()(const quint16 &i, const quint16 &j) const
@@ -131,32 +130,31 @@ template <typename T> inline void StaticMatrix<T>::addIdentity()
 
 template <typename T> StaticMatrix<T> &StaticMatrix<T>::operator=(const StaticMatrix<T> &other)
 {
-    if (other._data)
+    ASSERT(_data && other._data);
+    ASSERT((other._m > 0) && (other._n > 0));
+    ASSERT_INT(((unsigned long long) other._m) * ((unsigned long long) other._n));
+    size_t size = other._m * other._n;
+    if ((_m != other._m) || (_n != other._n))
     {
-        ASSERT((other._m > 0) && (other._n > 0));
-        ASSERT_INT(((unsigned long long) other._m) * ((unsigned long long) other._n));
-        size_t size = other._m * other._n;
-        if ((!_data) || (_m != other._m) || (_n != other._n))
-        {
-            _m = other._m;
-            _n = other._n;
-            if (_data)
-                delete[] _data;
-            _data = new T[size];
-        }
-        while (size)
-        {
-            --size;
-            _data[size] = other._data[size];
-        }
-    } else {
-        if (_data)
-        {
-            delete[] _data;
-            _data = NULL;
-        }
+        _m = other._m;
+        _n = other._n;
+        delete[] _data;
+        _data = new T[size];
+    }
+    while (size)
+    {
+        --size;
+        _data[size] = other._data[size];
     }
     return *this;
+}
+
+template <typename T> bool StaticMatrix<T>::operator==(const StaticMatrix<T> &other) const
+{
+    ASSERT(_data && other._data);
+    if ((_m != other._m) || (_n != other._n))
+        return false;
+    return memcmp((const void*) _data, (const void*) other._data, ((size_t) (_n * _m)) * sizeof(T)) == 0;
 }
 
 #endif // STATICMATRIX_H
