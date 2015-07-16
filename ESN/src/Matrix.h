@@ -34,6 +34,7 @@ public:
     Matrix<T> &operator=(const Matrix<T> &other);
     bool operator==(const Matrix<T> &other) const;
     bool operator!=(const Matrix<T> &other) const;
+    Matrix<T> &operator+=(const Matrix<T> &other);
 private:
     void deref();
     void detach();
@@ -157,6 +158,14 @@ template <typename T> bool Matrix<T>::operator!=(const Matrix<T> &other) const
         return !((*_p->d) == (*other._p->d));
     }
     return _p || other._p;
+}
+
+template <typename T> Matrix<T> &Matrix<T>::operator+=(const Matrix<T> &other)
+{
+    ASSERT(_p && other._p);
+    detach();
+    (*_p->d) += (*other._p->d); // No pb if the same pointer.
+    return *this;
 }
 
 template <typename T> void Matrix<T>::deref()

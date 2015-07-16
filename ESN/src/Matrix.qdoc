@@ -139,3 +139,23 @@
     Assigns the value of \a other to this matrix and returns a reference to it.
 */
 
+/*!
+    \fn bool Matrix<T>::operator==(const Matrix<T> &other) const
+
+    Returns \c true if this matrix and \a other hold the same data, \c false otherwise.
+*/
+
+/*!
+    \fn bool Matrix<T>::operator!=(const Matrix<T> &other) const
+
+    Returns \c true if this matrix and \a other hold different data, \c false otherwise.
+*/
+
+/*!
+    \fn Matrix<T> &Matrix<T>::operator+=(const Matrix<T> &other)
+
+    Appends \a other to this matrix, and returns a reference to it.
+
+    \warning Assumes that the two matrices are not null and have the same dimensions.
+*/
+
