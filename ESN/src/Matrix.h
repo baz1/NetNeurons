@@ -66,7 +66,10 @@ template <typename T> inline Matrix<T>::Matrix(const Matrix<T> &other)
 {
     _p = other._p;
     if (_p)
+    {
+        ASSERT_INT(((unsigned long long) _p->n) + 1ULL);
         ++_p->n;
+    }
 }
 
 template <typename T> inline Matrix<T>::Matrix(int m, int n, T *data)
@@ -159,7 +162,10 @@ template <typename T> Matrix<T> &Matrix<T>::operator=(const Matrix<T> &other)
     deref();
     _p = other._p;
     if (_p)
+    {
+        ASSERT_INT(((unsigned long long) _p->n) + 1ULL);
         ++_p->n;
+    }
     return *this;
 }
 
