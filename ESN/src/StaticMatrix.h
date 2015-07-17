@@ -9,6 +9,7 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <limits.h>
 
 #define MATRIX_MEM_CMP 0
 
@@ -22,7 +23,7 @@
   #endif
 #endif
 
-#define ASSERT_INT(x) ASSERT((x) < (1ULL << (sizeof(int) * 8 - 1)))
+#define ASSERT_INT(x) ASSERT((x) <= INT_MAX)
 
 template <typename T> class StaticMatrix
 {
@@ -57,6 +58,8 @@ public:
     inline StaticMatrix<T> &operator/=(const T &c) { return ((*this) *= (1 / c)); }
     StaticMatrix<T> &operator*=(const StaticMatrix<T> &other);
     StaticMatrix<T> &partialProduct(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2, int i1, int i2, int j1, int j2);
+    /* Cut and merge operations */
+    StaticMatrix<T> &cut(const StaticMatrix<T> &other, int di = 0, int dj = 0, int si = 0, int sj = 0, int sm = INT_MAX, int sn = INT_MAX);
     /* Other functions */
     void print(FILE *stream, const char *(*toString) (T), const char *prepend = "  ") const;
 public: /* Use with caution: */
@@ -314,6 +317,49 @@ template <typename T> StaticMatrix<T> &StaticMatrix<T>::partialProduct(const Sta
             }
             ++index3;
         }
+    }
+    return *this;
+}
+
+template <typename T> StaticMatrix<T> &StaticMatrix<T>::cut(const StaticMatrix<T> &other, int di, int dj, int si, int sj, int sm, int sn)
+{
+    int tmp;
+    ASSERT(_data && other._data);
+    ASSERT((si >= 0) && (sj >= 0));
+    if (di < 0)
+    {
+        si += di;
+        sm += di;
+        di = 0;
+    }
+    if (dj < 0)
+    {
+        sj += dj;
+        sn += dj;
+        dj = 0;
+    }
+    tmp = other._n - sj;
+    if (tmp < sn)
+        sn = tmp;
+    tmp = _n - dj;
+    if (tmp < sn)
+        sn = tmp;
+    if (sn <= 0)
+        return *this;
+    tmp = other._m - si;
+    if (tmp < sm)
+        sm = tmp;
+    tmp = _m - di;
+    if (tmp < sm)
+        sm = tmp;
+    dj += di * _n;
+    sj += si * other._n;
+    while (sm > 0)
+    {
+        memcpy((void*) &_data[dj], (void*) &other._data[sj], sn * sizeof(T));
+        sj += other._n;
+        dj += _n;
+        --sm;
     }
     return *this;
 }

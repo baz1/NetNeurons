@@ -55,6 +55,7 @@ public:
     /* Cut and merge operations */
     static Matrix<T> mergeH(const Matrix<T> &m1, const Matrix<T> &m2);
     static Matrix<T> mergeV(const Matrix<T> &m1, const Matrix<T> &m2);
+    inline Matrix<T> &cut(const Matrix<T> &other, int di = 0, int dj = 0, int si = 0, int sj = 0, int sm = INT_MAX, int sn = INT_MAX);
     /* Other functions */
     void print(FILE *stream, const char *(*toString) (T), const char *prepend = "  ") const;
 public:
@@ -271,6 +272,14 @@ template <typename T> Matrix<T> Matrix<T>::mergeV(const Matrix<T> &m1, const Mat
 {
     ASSERT(m1._p && m2._p);
     return Matrix<T>(StaticMatrix<T>::mergeV(*m1._p->d, *m2._p->d));
+}
+
+template <typename T> inline Matrix<T> &Matrix<T>::cut(const Matrix<T> &other, int di, int dj, int si, int sj, int sm, int sn)
+{
+    ASSERT(_p && other._p);
+    detach();
+    _p->d->cut(*other._p->d, di, dj, si, sj, sm, sn);
+    return *this;
 }
 
 template <typename T> void Matrix<T>::print(FILE *stream, const char *(*toString) (T), const char *prepend) const
