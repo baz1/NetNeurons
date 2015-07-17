@@ -63,6 +63,9 @@ public: /* Use with caution: */
     StaticMatrix<T> *getOpposite() const;
     StaticMatrix<T> *getProduct(const StaticMatrix<T> &other) const;
     static inline StaticMatrix<T> *prepareProduct(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2);
+    /* Cut and merge operations */
+    static StaticMatrix<T> *mergeH(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2);
+    static StaticMatrix<T> *mergeV(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2);
 private:
     int _m, _n; // _m rows, _n columns
     T *_data; // data[i * _n + j] for the i-th row, j-th column
@@ -385,6 +388,38 @@ template <typename T> inline StaticMatrix<T> *StaticMatrix<T>::prepareProduct(co
     ASSERT_INT(((unsigned long long) m1._m) * ((unsigned long long) m2._n));
     ASSERT_INT((((unsigned long long) m1._n) + 1ULL) * ((unsigned long long) m2._n)); // For the following calculus
     return new StaticMatrix<T>(m1._m, m2._n, new T[m1._m * m2._n]);
+}
+
+template <typename T> StaticMatrix<T> *StaticMatrix<T>::mergeH(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2)
+{
+    ASSERT(m1._data && m2._data && (m1._m == m2._m));
+    ASSERT_INT(((unsigned long long) m1._m) * (((unsigned long long) m1._n) + ((unsigned long long) m2._n)));
+    int m3_n = m1._n + m2._n;
+    int i = m1._m, i1 = m1._m * m1._n, i2 = m2._m * m2._n, i3 = m1._m * m3_n;
+    T *data = new T[i3];
+    while (i)
+    {
+        --i;
+        i2 -= m2._n;
+        i3 -= m2._n;
+        memcpy((void*) &data[i3], (void*) &m2._data[i2], m2._n * sizeof(T));
+        i1 -= m1._n;
+        i3 -= m1._n;
+        memcpy((void*) &data[i3], (void*) &m1._data[i1], m1._n * sizeof(T));
+    }
+    return new StaticMatrix<T>(m1._m, m3_n, data);
+}
+
+template <typename T> StaticMatrix<T> *StaticMatrix<T>::mergeV(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2)
+{
+    ASSERT(m1._data && m2._data && (m1._n == m2._n));
+    ASSERT_INT((((unsigned long long) m1._m) + ((unsigned long long) m2._m)) * ((unsigned long long) m1._n));
+    int m3_m = m1._m + m2._m;
+    T *data = new T[m3_m * m1._n];
+    size_t m1_size = m1._m * m1._n;
+    memcpy((void*) data, (void*) m1._data, m1_size * sizeof(T));
+    memcpy((void*) &data[m1_size], (void*) m2._data, m2._m * m2._n * sizeof(T));
+    return new StaticMatrix<T>(m3_m, m1._n, data);
 }
 
 #endif // STATICMATRIX_H

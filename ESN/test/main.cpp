@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
     // TODO (please, return here later!)
-    Matrix<double> m1(2, 4), m2(4, 2), p1, p2;
+    Matrix<double> m1(2, 4), m2(4, 2), p1, p2, test;
     srand(0);
     for (int i = 0; i < 2; ++i)
     {
@@ -40,5 +40,7 @@ int main(int argc, char *argv[])
     DISP(p2)
     p2.partialProduct(m1, m2, 1, 1, 0, 1);
     DISP(p2)
+    test = Matrix<double>::mergeV(p1, p2);
+    DISP(test)
     return 0;
 }

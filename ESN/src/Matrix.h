@@ -52,6 +52,9 @@ public:
     inline Matrix<T> &operator/=(const T &c) { return ((*this) *= (1 / c)); }
     Matrix<T> &operator*=(const Matrix<T> &other);
     inline Matrix<T> &partialProduct(const Matrix<T> &m1, const Matrix<T> &m2, int i1, int i2, int j1, int j2);
+    /* Cut and merge operations */
+    static Matrix<T> mergeH(const Matrix<T> &m1, const Matrix<T> &m2);
+    static Matrix<T> mergeV(const Matrix<T> &m1, const Matrix<T> &m2);
     /* Other functions */
     void print(FILE *stream, const char *(*toString) (T), const char *prepend = "  ") const;
 public:
@@ -131,7 +134,7 @@ template <typename T> void Matrix<T>::fill(T value)
     if (_p->n > 1)
     {
         --_p->n;
-        _p = new Data(new StaticMatrix(_p->d->countRows(), _p->d->countCols(), value));
+        _p = new Data(new StaticMatrix<T>(_p->d->countRows(), _p->d->countCols(), value));
     } else {
         _p->d->fill(value);
     }
@@ -143,7 +146,7 @@ template <typename T> inline void Matrix<T>::fillZero()
     if (_p->n > 1)
     {
         --_p->n;
-        _p = new Data(new StaticMatrix(_p->d->countRows(), _p->d->countCols()));
+        _p = new Data(new StaticMatrix<T>(_p->d->countRows(), _p->d->countCols()));
     } else {
         _p->d->fillZero();
     }
@@ -256,6 +259,18 @@ template <typename T> inline Matrix<T> &Matrix<T>::partialProduct(const Matrix<T
     detach();
     _p->d->partialProduct(*m1._p->d, *m2._p->d, i1, i2, j1, j2);
     return *this;
+}
+
+template <typename T> Matrix<T> Matrix<T>::mergeH(const Matrix<T> &m1, const Matrix<T> &m2)
+{
+    ASSERT(m1._p && m2._p);
+    return Matrix<T>(StaticMatrix<T>::mergeH(*m1._p->d, *m2._p->d));
+}
+
+template <typename T> Matrix<T> Matrix<T>::mergeV(const Matrix<T> &m1, const Matrix<T> &m2)
+{
+    ASSERT(m1._p && m2._p);
+    return Matrix<T>(StaticMatrix<T>::mergeV(*m1._p->d, *m2._p->d));
 }
 
 template <typename T> void Matrix<T>::print(FILE *stream, const char *(*toString) (T), const char *prepend) const
