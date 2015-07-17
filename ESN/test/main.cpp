@@ -38,5 +38,7 @@ int main(int argc, char *argv[])
     m3.cut(m2, 2, 0, 0, 0, 2, 2);
     m3.cut(m2, 2, 2, 2, 0);
     DISP(m3)
+    m3 = m1.transpose();
+    DISP(m3)
     return 0;
 }

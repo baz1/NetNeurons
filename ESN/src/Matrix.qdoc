@@ -238,6 +238,14 @@
 */
 
 /*!
+    \fn Matrix<T> Matrix<T>::transpose() const
+
+    Returns the transpose of the matrix.
+
+    \warning Assumes that the matrix is not null.
+*/
+
+/*!
     \fn Matrix<T> Matrix<T>::mergeH(const Matrix<T> &m1, const Matrix<T> &m2)
 
     Merges horizontally the matrices \a m1 and \a m2 and returns the resulting matrix.

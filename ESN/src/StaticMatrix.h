@@ -66,6 +66,7 @@ public: /* Use with caution: */
     StaticMatrix<T> *getOpposite() const;
     StaticMatrix<T> *getProduct(const StaticMatrix<T> &other) const;
     static inline StaticMatrix<T> *prepareProduct(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2);
+    StaticMatrix<T> *getTranspose() const;
     /* Cut and merge operations */
     static StaticMatrix<T> *mergeH(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2);
     static StaticMatrix<T> *mergeV(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2);
@@ -267,7 +268,7 @@ template <typename T> StaticMatrix<T> &StaticMatrix<T>::operator*=(const StaticM
     /* We assume that the naive algorithm is sufficient with the matrices that we use here. */
     ASSERT_INT((((unsigned long long) _n) + 1ULL) * ((unsigned long long) other._n));
     int i = _m, j, k, index1, index2, index3;
-    T *data = new T[index3 = _m * other._n];
+    T *data = new T[(index3 = _m * other._n)];
     while (i)
     {
         --i;
@@ -404,7 +405,7 @@ template <typename T> StaticMatrix<T> *StaticMatrix<T>::getProduct(const StaticM
     /* We assume that the naive algorithm is sufficient with the matrices that we use here. */
     ASSERT_INT((((unsigned long long) _n) + 1ULL) * ((unsigned long long) other._n));
     int i = _m, j, k, index1, index2, index3;
-    T *data = new T[index3 = _m * other._n];
+    T *data = new T[(index3 = _m * other._n)];
     while (i)
     {
         --i;
@@ -434,6 +435,27 @@ template <typename T> inline StaticMatrix<T> *StaticMatrix<T>::prepareProduct(co
     ASSERT_INT(((unsigned long long) m1._m) * ((unsigned long long) m2._n));
     ASSERT_INT((((unsigned long long) m1._n) + 1ULL) * ((unsigned long long) m2._n)); // For the following calculus
     return new StaticMatrix<T>(m1._m, m2._n, new T[m1._m * m2._n]);
+}
+
+template <typename T> StaticMatrix<T> *StaticMatrix<T>::getTranspose() const
+{
+    ASSERT(_data);
+    int size = _m * _n;
+    ASSERT_INT(((unsigned long long) size) + ((unsigned long long) _n));
+    T *data = new T[size];
+    int i2 = size, i1s = _n, i1, i;
+    while (i2)
+    {
+        i1 = size + (--i1s);
+        i = _m;
+        while (i)
+        {
+            --i;
+            i1 -= _n;
+            data[--i2] = _data[i1];
+        }
+    }
+    return new StaticMatrix<T>(_n, _m, data);
 }
 
 template <typename T> StaticMatrix<T> *StaticMatrix<T>::mergeH(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2)
