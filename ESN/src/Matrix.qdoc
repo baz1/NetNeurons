@@ -159,3 +159,25 @@
     \warning Assumes that the two matrices are not null and have the same dimensions.
 */
 
+/*!
+    \fn Matrix<T> &Matrix<T>::operator-=(const Matrix<T> &other)
+
+    Subtracts \a other to this matrix, and returns a reference to it.
+
+    \warning Assumes that the two matrices are not null and have the same dimensions.
+*/
+
+/*!
+    \fn Matrix<T> Matrix<T>::operator+() const
+
+    Returns a copy of this matrix.
+*/
+
+/*!
+    \fn Matrix<T> Matrix<T>::operator-() const
+
+    Returns the opposit of this matrix.
+
+    \warning Assumes that the matrix is not null.
+*/
+

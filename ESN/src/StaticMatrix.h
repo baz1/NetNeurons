@@ -47,6 +47,11 @@ public:
     bool operator==(const StaticMatrix<T> &other) const;
     inline bool operator!=(const StaticMatrix<T> &other) const { return !((*this) == other); }
     StaticMatrix<T> &operator+=(const StaticMatrix<T> &other);
+    StaticMatrix<T> &operator-=(const StaticMatrix<T> &other);
+    inline StaticMatrix<T> operator+() const { return *this; }
+    StaticMatrix<T> operator-() const;
+public:
+    StaticMatrix<T> *getOpposit() const;
 private:
     T *_data; // data[i * _n + j] for the i-th row, j-th column
     int _m, _n; // _m rows, _n columns
@@ -184,6 +189,45 @@ template <typename T> StaticMatrix<T> &StaticMatrix<T>::operator+=(const StaticM
         _data[size] += other._data[size];
     }
     return *this;
+}
+
+template <typename T> StaticMatrix<T> &StaticMatrix<T>::operator-=(const StaticMatrix<T> &other)
+{
+    ASSERT(_data && other._data);
+    ASSERT((_m == other._m) || (_n == other._n));
+    size_t size = _m * _n;
+    while (size)
+    {
+        --size;
+        _data[size] -= other._data[size];
+    }
+    return *this;
+}
+
+template <typename T> StaticMatrix<T> StaticMatrix<T>::operator-() const
+{
+    ASSERT(_data);
+    size_t size = _m * _n;
+    T *data = new T[size];
+    while (size)
+    {
+        --size;
+        data[size] = -_data[size];
+    }
+    return StaticMatrix(_m, _n, data);
+}
+
+template <typename T> StaticMatrix<T> *StaticMatrix<T>::getOpposit() const
+{
+    ASSERT(_data);
+    size_t size = _m * _n;
+    T *data = new T[size];
+    while (size)
+    {
+        --size;
+        data[size] = -_data[size];
+    }
+    return new StaticMatrix(_m, _n, data);
 }
 
 #endif // STATICMATRIX_H

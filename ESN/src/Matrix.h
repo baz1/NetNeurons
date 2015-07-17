@@ -11,6 +11,14 @@
 
 template <typename T> class Matrix
 {
+private:
+    struct Data
+    {
+        StaticMatrix<T> *d;
+        int n;
+        inline Data(StaticMatrix<T> *d) : d(d), n(1) {}
+    };
+    Data *_p;
 public:
     /* Constructors & destructor */
     inline Matrix() : _p(NULL) {}
@@ -35,17 +43,13 @@ public:
     bool operator==(const Matrix<T> &other) const;
     bool operator!=(const Matrix<T> &other) const;
     Matrix<T> &operator+=(const Matrix<T> &other);
+    Matrix<T> &operator-=(const Matrix<T> &other);
+    inline Matrix<T> operator+() const { return *this; }
+    Matrix<T> operator-() const;
 private:
+    inline Matrix(StaticMatrix<T> *d) : _p(new Data(d)) {}
     void deref();
     void detach();
-private:
-    struct Data
-    {
-        StaticMatrix<T> *d;
-        int n;
-        inline Data(StaticMatrix<T> *d) : d(d), n(1) {}
-    };
-    Data *_p;
 };
 
 template <typename T> inline Matrix<T>::Matrix(const Matrix<T> &other)
@@ -166,6 +170,20 @@ template <typename T> Matrix<T> &Matrix<T>::operator+=(const Matrix<T> &other)
     detach();
     (*_p->d) += (*other._p->d); // No pb if the same pointer.
     return *this;
+}
+
+template <typename T> Matrix<T> &Matrix<T>::operator-=(const Matrix<T> &other)
+{
+    ASSERT(_p && other._p);
+    detach();
+    (*_p->d) -= (*other._p->d); // No pb if the same pointer.
+    return *this;
+}
+
+template <typename T> Matrix<T> Matrix<T>::operator-() const
+{
+    ASSERT(_p);
+    return Matrix<T>(_p->d->getOpposit());
 }
 
 template <typename T> void Matrix<T>::deref()
