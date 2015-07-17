@@ -223,7 +223,7 @@
 */
 
 /*!
-    \fn Matrix<T> &Matrix<T>::getProduct(const Matrix<T> &m1, const Matrix<T> &m2, int i1, int i2, int j1, int j2)
+    \fn Matrix<T> &Matrix<T>::partialProduct(const Matrix<T> &m1, const Matrix<T> &m2, int i1, int i2, int j1, int j2)
 
     Calculates the coefficients of the product of \a m1 with \a m2 for indices i in [\a i1, \a i2]
     and j in [\a j1, \a j2], and returns a reference to the modified matrix.
@@ -238,6 +238,29 @@
 */
 
 /*!
+    \fn Matrix<T> Matrix<T>::mergeH(const Matrix<T> &m1, const Matrix<T> &m2)
+
+    Merges horizontally the matrices \a m1 and \a m2 and returns the resulting matrix.
+
+    \warning Assumes that both matrices are not null, and that their sizes match.
+*/
+
+/*!
+    \fn Matrix<T> Matrix<T>::mergeV(const Matrix<T> &m1, const Matrix<T> &m2)
+
+    Merges vertically the matrices \a m1 and \a m2 and returns the resulting matrix.
+
+    \warning Assumes that both matrices are not null, and that their sizes match.
+*/
+
+/*!
+    \fn void Matrix<T>::print(FILE *stream, const char *(*toString) (T), const char *prepend) const
+
+    Prints the content of this matrix in \a stream, using the function \a toString
+    to convert elements to string values. \a prepend is added at the beginning of each line.
+*/
+
+/*!
     \fn static Matrix<T> Matrix<T>::prepareProduct(const Matrix<T> &m1, const Matrix<T> &m2)
 
     Constructs a new matrix that has dimensions corresponding to the product \a m1 times \a m2,
@@ -248,6 +271,6 @@
 
     \warning Assumes that both matrices are not null, and that their sizes match.
 
-    \sa getProduct()
+    \sa partialProduct()
 */
 
