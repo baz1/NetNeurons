@@ -46,6 +46,8 @@ public:
     Matrix<T> &operator-=(const Matrix<T> &other);
     inline Matrix<T> operator+() const { return *this; }
     Matrix<T> operator-() const;
+    Matrix<T> &operator*=(const T &c);
+    inline Matrix<T> &operator/=(const T &c) { return ((*this) *= (1 / c)); }
 private:
     inline Matrix(StaticMatrix<T> *d) : _p(new Data(d)) {}
     void deref();
@@ -184,6 +186,14 @@ template <typename T> Matrix<T> Matrix<T>::operator-() const
 {
     ASSERT(_p);
     return Matrix<T>(_p->d->getOpposit());
+}
+
+template <typename T> Matrix<T> &Matrix<T>::operator*=(const T &c)
+{
+    ASSERT(_p);
+    detach();
+    (*_p->d) *= c;
+    return *this;
 }
 
 template <typename T> void Matrix<T>::deref()

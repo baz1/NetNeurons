@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
     qDebug() << f.constData() << m.constData() << (f==m);
     m.addIdentity();
     qDebug() << f.constData() << m.constData() << (f==m);
-    f -= -f;
+    f *= 2;
     qDebug() << f.constData() << m.constData() << (f==m);
     return 0;
 }
