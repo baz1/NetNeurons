@@ -8,6 +8,7 @@
 #define STATICMATRIX_H
 
 #include <string.h>
+#include <stdio.h>
 
 #define MATRIX_MEM_CMP 0
 
@@ -56,6 +57,8 @@ public:
     inline StaticMatrix<T> &operator/=(const T &c) { return ((*this) *= (1 / c)); }
     StaticMatrix<T> &operator*=(const StaticMatrix<T> &other);
     StaticMatrix<T> &getProduct(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2, int i1, int i2, int j1, int j2);
+    /* Other functions */
+    void print(FILE *stream, char *(*toString) (T), const char *prepend = "  ") const;
 public: /* Use with caution: */
     StaticMatrix<T> *getOpposit() const;
     static inline StaticMatrix<T> *prepareProduct(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2);
@@ -309,6 +312,26 @@ template <typename T> StaticMatrix<T> &StaticMatrix<T>::getProduct(const StaticM
         }
     }
     return *this;
+}
+
+template <typename T> void StaticMatrix<T>::print(FILE *stream, char *(*toString) (T), const char *prepend) const
+{
+    ASSERT(_data);
+    int index = 0;
+    for (int i = 0; i < _m; ++i)
+    {
+        fprintf(stream, "%s[", prepend);
+        for (int j = 0; j < _n; ++j)
+        {
+            if (j)
+            {
+                fprintf(stream, "  %s", toString(_data[index++]));
+            } else {
+                fprintf(stream, "%s", toString(_data[index++]));
+            }
+        }
+        fprintf(stream, "]\n");
+    }
 }
 
 template <typename T> StaticMatrix<T> *StaticMatrix<T>::getOpposit() const
