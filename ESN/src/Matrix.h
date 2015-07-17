@@ -46,6 +46,8 @@ public:
     Matrix<T> &operator-=(const Matrix<T> &other);
     inline Matrix<T> operator+() const { return *this; }
     Matrix<T> operator-() const;
+    Matrix<T> operator+(const Matrix<T> &other) const;
+    Matrix<T> operator-(const Matrix<T> &other) const;
     Matrix<T> &operator*=(const T &c);
     inline Matrix<T> &operator/=(const T &c) { return ((*this) *= (1 / c)); }
 private:
@@ -186,6 +188,22 @@ template <typename T> Matrix<T> Matrix<T>::operator-() const
 {
     ASSERT(_p);
     return Matrix<T>(_p->d->getOpposit());
+}
+
+template <typename T> Matrix<T> Matrix<T>::operator+(const Matrix<T> &other) const
+{
+    ASSERT(_p && other._p);
+    Matrix<T> result(new StaticMatrix<T>(*_p->d));
+    (*result._p->d) += (*other._p->d); // No pb if the same pointer.
+    return result;
+}
+
+template <typename T> Matrix<T> Matrix<T>::operator-(const Matrix<T> &other) const
+{
+    ASSERT(_p && other._p);
+    Matrix<T> result(new StaticMatrix<T>(*_p->d));
+    (*result._p->d) -= (*other._p->d); // No pb if the same pointer.
+    return result;
 }
 
 template <typename T> Matrix<T> &Matrix<T>::operator*=(const T &c)

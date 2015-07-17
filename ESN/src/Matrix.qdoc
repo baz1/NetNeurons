@@ -181,3 +181,35 @@
     \warning Assumes that the matrix is not null.
 */
 
+/*!
+    \fn Matrix<T> Matrix<T>::operator+(const Matrix<T> &other) const
+
+    Returns this matrix plus \a other.
+
+    \warning Assumes that both matrices are not null.
+*/
+
+/*!
+    \fn Matrix<T> Matrix<T>::operator-(const Matrix<T> &other) const
+
+    Returns this matrix minus \a other.
+
+    \warning Assumes that both matrices are not null.
+*/
+
+/*!
+    \fn Matrix<T> &Matrix<T>::operator*=(const T &c)
+
+    Multiplies this matrix with the coefficient \a c, and returns a reference to it.
+
+    \warning Assumes that the matrix is not null.
+*/
+
+/*!
+    \fn Matrix<T> &Matrix<T>::operator/=(const T &c)
+
+    Divides this matrix with the coefficient \a c, and returns a reference to it.
+
+    \warning Assumes that the matrix is not null.
+*/
+

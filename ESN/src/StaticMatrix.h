@@ -11,7 +11,7 @@
 
 #define MATRIX_MEM_CMP 0
 
-#ifdef QT_VERSION
+#ifdef QT_VERSION /* Are we using Qt? */
   #include <QtGlobal>
   #define ASSERT(x) Q_ASSERT(x)
 #else
@@ -50,6 +50,8 @@ public:
     StaticMatrix<T> &operator-=(const StaticMatrix<T> &other);
     inline StaticMatrix<T> operator+() const { return *this; }
     StaticMatrix<T> operator-() const;
+    inline StaticMatrix<T> operator+(const StaticMatrix<T> &other) const;
+    inline StaticMatrix<T> operator-(const StaticMatrix<T> &other) const;
     StaticMatrix<T> &operator*=(const T &c);
     inline StaticMatrix<T> &operator/=(const T &c) { return ((*this) *= (1 / c)); }
 public:
@@ -217,6 +219,22 @@ template <typename T> StaticMatrix<T> StaticMatrix<T>::operator-() const
         data[size] = -_data[size];
     }
     return StaticMatrix(_m, _n, data);
+}
+
+template <typename T> inline StaticMatrix<T> StaticMatrix<T>::operator+(const StaticMatrix<T> &other) const
+{
+    ASSERT(_data && other._data);
+    StaticMatrix<T> result(*this);
+    result += other;
+    return result;
+}
+
+template <typename T> inline StaticMatrix<T> StaticMatrix<T>::operator-(const StaticMatrix<T> &other) const
+{
+    ASSERT(_data && other._data);
+    StaticMatrix<T> result(*this);
+    result -= other;
+    return result;
 }
 
 template <typename T> StaticMatrix<T> &StaticMatrix<T>::operator*=(const T &c)
