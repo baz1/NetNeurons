@@ -41,7 +41,7 @@ public:
     inline void fillZero();
     inline int countRows() const { return _m; }
     inline int countCols() const { return _n; }
-    inline void addIdentity();
+    inline StaticMatrix<T> &addIdentity();
     /* Mathematical operators */
     StaticMatrix<T> &operator=(const StaticMatrix<T> &other);
     bool operator==(const StaticMatrix<T> &other) const;
@@ -54,8 +54,11 @@ public:
     inline StaticMatrix<T> operator-(const StaticMatrix<T> &other) const;
     StaticMatrix<T> &operator*=(const T &c);
     inline StaticMatrix<T> &operator/=(const T &c) { return ((*this) *= (1 / c)); }
-public:
+    StaticMatrix<T> &operator*=(const StaticMatrix<T> &other);
+    StaticMatrix<T> &getProduct(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2, int i1, int i2, int j1, int j2);
+public: /* Use with caution: */
     StaticMatrix<T> *getOpposit() const;
+    static inline StaticMatrix<T> *prepareProduct(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2);
 private:
     int _m, _n; // _m rows, _n columns
     T *_data; // data[i * _n + j] for the i-th row, j-th column
@@ -131,7 +134,7 @@ template <typename T> inline void StaticMatrix<T>::fillZero()
     memset((void*) _data, 0, _m * _n * sizeof(T));
 }
 
-template <typename T> inline void StaticMatrix<T>::addIdentity()
+template <typename T> inline StaticMatrix<T> &StaticMatrix<T>::addIdentity()
 {
     ASSERT(_data);
     ASSERT_INT(((unsigned long long) _n) + 1);
@@ -140,6 +143,7 @@ template <typename T> inline void StaticMatrix<T>::addIdentity()
     min *= step;
     while (min)
         _data[min -= step] += 1;
+    return *this;
 }
 
 template <typename T> StaticMatrix<T> &StaticMatrix<T>::operator=(const StaticMatrix<T> &other)
@@ -246,6 +250,67 @@ template <typename T> StaticMatrix<T> &StaticMatrix<T>::operator*=(const T &c)
     return *this;
 }
 
+template <typename T> StaticMatrix<T> &StaticMatrix<T>::operator*=(const StaticMatrix<T> &other)
+{
+    ASSERT(_data && other._data && (_n == other._m));
+    ASSERT_INT(((unsigned long long) _m) * ((unsigned long long) other._n));
+    /* We assume that the naive algorithm is sufficient with the matrices that we use here. */
+    ASSERT_INT((((unsigned long long) _n) + 1ULL) * ((unsigned long long) other._n));
+    int i = _m, j, k, index1, index2, index3;
+    T *data = new T[index3 = _m * other._n];
+    while (i)
+    {
+        --i;
+        index1 = i * _n;
+        j = other._n;
+        while (j)
+        {
+            --j;
+            --index3;
+            data[index3] = 0;
+            index2 = _n * other._n + j;
+            k = _n;
+            while (k)
+            {
+                --k;
+                index2 -= other._n;
+                data[index3] += _data[index1 + k] * other._data[index2];
+            }
+        }
+    }
+    delete[] _data;
+    _n = other._n;
+    _data = data;
+    return *this;
+}
+
+template <typename T> StaticMatrix<T> &StaticMatrix<T>::getProduct(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2, int i1, int i2, int j1, int j2)
+{
+    ASSERT(_data && m1._data && m2._data);
+    ASSERT((_m == m1._m) && (m1._n == m2._m) && (m2._n == _n));
+    ASSERT((i1 >= 0) && (i1 <= i2) && (i2 < _m) && (j1 >= 0) && (j1 <= j2) && (j2 < _n));
+    int i, j, k, index1, index2, index3;
+    for (i = i1; i <= i2; ++i)
+    {
+        index1 = i * m1._n;
+        index3 = i * _n + j1;
+        for (j = j1; j <= j2; ++j)
+        {
+            _data[index3] = 0;
+            index2 = m1._n * _n + j;
+            k = _n;
+            while (k)
+            {
+                --k;
+                index2 -= _n;
+                _data[index3] += m1._data[index1 + k] * m2._data[index2];
+            }
+            ++index3;
+        }
+    }
+    return *this;
+}
+
 template <typename T> StaticMatrix<T> *StaticMatrix<T>::getOpposit() const
 {
     ASSERT(_data);
@@ -257,6 +322,14 @@ template <typename T> StaticMatrix<T> *StaticMatrix<T>::getOpposit() const
         data[size] = -_data[size];
     }
     return new StaticMatrix(_m, _n, data);
+}
+
+template <typename T> inline StaticMatrix<T> *StaticMatrix<T>::prepareProduct(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2)
+{
+    ASSERT(m1._data && m2._data && (m1._n == m2._m));
+    ASSERT_INT(((unsigned long long) m1._m) * ((unsigned long long) m2._n));
+    ASSERT_INT((((unsigned long long) m1._n) + 1ULL) * ((unsigned long long) m2._n)); // For the following calculus
+    return new StaticMatrix<T>(m1._m, m2._n, new T[m1._m * m2._n]);
 }
 
 #endif // STATICMATRIX_H

@@ -37,7 +37,7 @@ public:
     inline void fillZero();
     inline int countRows() const { return _p ? _p->d->countRows() : 0; }
     inline int countCols() const { return _p ? _p->d->countCols() : 0; }
-    void addIdentity();
+    Matrix<T> &addIdentity();
     /* Mathematical operators */
     Matrix<T> &operator=(const Matrix<T> &other);
     bool operator==(const Matrix<T> &other) const;
@@ -50,6 +50,10 @@ public:
     Matrix<T> operator-(const Matrix<T> &other) const;
     Matrix<T> &operator*=(const T &c);
     inline Matrix<T> &operator/=(const T &c) { return ((*this) *= (1 / c)); }
+    Matrix<T> &operator*=(const Matrix<T> &other);
+    inline Matrix<T> &getProduct(const Matrix<T> &m1, const Matrix<T> &m2, int i1, int i2, int j1, int j2);
+public:
+    static Matrix<T> prepareProduct(const Matrix<T> &m1, const Matrix<T> &m2);
 private:
     inline Matrix(StaticMatrix<T> *d) : _p(new Data(d)) {}
     void deref();
@@ -130,11 +134,12 @@ template <typename T> inline void Matrix<T>::fillZero()
     _p->d->fillZero();
 }
 
-template <typename T> void Matrix<T>::addIdentity()
+template <typename T> Matrix<T> &Matrix<T>::addIdentity()
 {
     detach();
     ASSERT(_p);
     _p->d->addIdentity();
+    return *this;
 }
 
 template <typename T> Matrix<T> &Matrix<T>::operator=(const Matrix<T> &other)
@@ -212,6 +217,28 @@ template <typename T> Matrix<T> &Matrix<T>::operator*=(const T &c)
     detach();
     (*_p->d) *= c;
     return *this;
+}
+
+template <typename T> Matrix<T> &Matrix<T>::operator*=(const Matrix<T> &other)
+{
+    ASSERT(_p);
+    detach();
+    (*_p->d) *= other;
+    return *this;
+}
+
+template <typename T> inline Matrix<T> &Matrix<T>::getProduct(const Matrix<T> &m1, const Matrix<T> &m2, int i1, int i2, int j1, int j2)
+{
+    ASSERT(_p && m1._p && m2._p);
+    detach();
+    _p->d->getProduct(*m1._p->d, *m2._p->d, i1, i2, j1, j2);
+    return *this;
+}
+
+template <typename T> Matrix<T> Matrix<T>::prepareProduct(const Matrix<T> &m1, const Matrix<T> &m2)
+{
+    ASSERT(m1._p && m2._p);
+    return Matrix<T>(StaticMatrix<T>::prepareProduct(*m1._p->d, *m2._p->d));
 }
 
 template <typename T> void Matrix<T>::deref()

@@ -269,7 +269,7 @@ void BrainInterface::train(QList<double> inputValues, QList<double> outputValues
     \note The macro value \c NEURON_ENABLE_LEARNING needs to be true (default value)
     for this function to operate.
 
-    \sa BrainInterface::train(QList<double> inputValues, QList<double> outputValues)
+    \sa train()
 */
 double BrainInterface::learn()
 {

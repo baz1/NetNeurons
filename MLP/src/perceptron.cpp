@@ -278,7 +278,7 @@ void Perceptron::multithreadedTrain(int n_threads)
     This function is automatically called in the destructor, and is equivalent
     to calling multithreadedTrain(1).
 
-    \sa Perceptron::multithreadedTrain(int threads)
+    \sa multithreadedTrain()
 */
 void Perceptron::killThreads()
 {
@@ -319,7 +319,7 @@ void Perceptron::killThreads()
     \note This function might use several threads if you called the function
     multithreadedTrain beforehand.
 
-    \sa Perceptron::multithreadedTrain(int threads)
+    \sa multithreadedTrain()
 */
 double Perceptron::train(int size, double **inputs, double **outputs)
 {
