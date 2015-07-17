@@ -58,7 +58,7 @@ public:
     StaticMatrix<T> &operator*=(const StaticMatrix<T> &other);
     StaticMatrix<T> &getProduct(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2, int i1, int i2, int j1, int j2);
     /* Other functions */
-    void print(FILE *stream, char *(*toString) (T), const char *prepend = "  ") const;
+    void print(FILE *stream, const char *(*toString) (T), const char *prepend = "  ") const;
 public: /* Use with caution: */
     StaticMatrix<T> *getOpposit() const;
     static inline StaticMatrix<T> *prepareProduct(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2);
@@ -301,7 +301,7 @@ template <typename T> StaticMatrix<T> &StaticMatrix<T>::getProduct(const StaticM
         {
             _data[index3] = 0;
             index2 = m1._n * _n + j;
-            k = _n;
+            k = m1._n;
             while (k)
             {
                 --k;
@@ -314,7 +314,7 @@ template <typename T> StaticMatrix<T> &StaticMatrix<T>::getProduct(const StaticM
     return *this;
 }
 
-template <typename T> void StaticMatrix<T>::print(FILE *stream, char *(*toString) (T), const char *prepend) const
+template <typename T> void StaticMatrix<T>::print(FILE *stream, const char *(*toString) (T), const char *prepend) const
 {
     ASSERT(_data);
     int index = 0;

@@ -53,7 +53,7 @@ public:
     Matrix<T> &operator*=(const Matrix<T> &other);
     inline Matrix<T> &getProduct(const Matrix<T> &m1, const Matrix<T> &m2, int i1, int i2, int j1, int j2);
     /* Other functions */
-    void print(FILE *stream, char *(*toString) (T), const char *prepend = "  ") const;
+    void print(FILE *stream, const char *(*toString) (T), const char *prepend = "  ") const;
 public:
     static Matrix<T> prepareProduct(const Matrix<T> &m1, const Matrix<T> &m2);
 private:
@@ -225,7 +225,7 @@ template <typename T> Matrix<T> &Matrix<T>::operator*=(const Matrix<T> &other)
 {
     ASSERT(_p);
     detach();
-    (*_p->d) *= other;
+    (*_p->d) *= (*other._p->d);
     return *this;
 }
 
@@ -237,13 +237,13 @@ template <typename T> inline Matrix<T> &Matrix<T>::getProduct(const Matrix<T> &m
     return *this;
 }
 
-template <typename T> void Matrix<T>::print(FILE *stream, char *(*toString) (T), const char *prepend) const
+template <typename T> void Matrix<T>::print(FILE *stream, const char *(*toString) (T), const char *prepend) const
 {
     if (_p)
     {
         _p->d->print(stream, toString, prepend);
     } else {
-        fprintf(stream, "%d[NULL]\n", prepend);
+        fprintf(stream, "%s[NULL]\n", prepend);
     }
 }
 
