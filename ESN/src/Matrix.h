@@ -51,7 +51,7 @@ public:
     Matrix<T> &operator*=(const T &c);
     inline Matrix<T> &operator/=(const T &c) { return ((*this) *= (1 / c)); }
     Matrix<T> &operator*=(const Matrix<T> &other);
-    inline Matrix<T> &getProduct(const Matrix<T> &m1, const Matrix<T> &m2, int i1, int i2, int j1, int j2);
+    inline Matrix<T> &partialProduct(const Matrix<T> &m1, const Matrix<T> &m2, int i1, int i2, int j1, int j2);
     /* Other functions */
     void print(FILE *stream, const char *(*toString) (T), const char *prepend = "  ") const;
 public:
@@ -124,16 +124,26 @@ template <typename T> inline T &Matrix<T>::operator()(const quint16 &i, const qu
 
 template <typename T> void Matrix<T>::fill(T value)
 {
-    detach();
     ASSERT(_p);
-    _p->d->fill(value);
+    if (_p->n > 1)
+    {
+        --_p->n;
+        _p = new Data(new StaticMatrix(_p->d->countRows(), _p->d->countCols(), value));
+    } else {
+        _p->d->fill(value);
+    }
 }
 
 template <typename T> inline void Matrix<T>::fillZero()
 {
-    detach();
     ASSERT(_p);
-    _p->d->fillZero();
+    if (_p->n > 1)
+    {
+        --_p->n;
+        _p = new Data(new StaticMatrix(_p->d->countRows(), _p->d->countCols()));
+    } else {
+        _p->d->fillZero();
+    }
 }
 
 template <typename T> Matrix<T> &Matrix<T>::addIdentity()
@@ -194,7 +204,7 @@ template <typename T> Matrix<T> &Matrix<T>::operator-=(const Matrix<T> &other)
 template <typename T> Matrix<T> Matrix<T>::operator-() const
 {
     ASSERT(_p);
-    return Matrix<T>(_p->d->getOpposit());
+    return Matrix<T>(_p->d->getOpposite());
 }
 
 template <typename T> Matrix<T> Matrix<T>::operator+(const Matrix<T> &other) const
@@ -223,17 +233,22 @@ template <typename T> Matrix<T> &Matrix<T>::operator*=(const T &c)
 
 template <typename T> Matrix<T> &Matrix<T>::operator*=(const Matrix<T> &other)
 {
-    ASSERT(_p);
-    detach();
-    (*_p->d) *= (*other._p->d);
+    ASSERT(_p && other._p);
+    StaticMatrix<T> *tmp = _p->d->getProduct(*other._p->d);
+    if (--_p->n <= 0)
+    {
+        delete _p->d;
+        delete _p;
+    }
+    _p = new Data(tmp);
     return *this;
 }
 
-template <typename T> inline Matrix<T> &Matrix<T>::getProduct(const Matrix<T> &m1, const Matrix<T> &m2, int i1, int i2, int j1, int j2)
+template <typename T> inline Matrix<T> &Matrix<T>::partialProduct(const Matrix<T> &m1, const Matrix<T> &m2, int i1, int i2, int j1, int j2)
 {
     ASSERT(_p && m1._p && m2._p);
     detach();
-    _p->d->getProduct(*m1._p->d, *m2._p->d, i1, i2, j1, j2);
+    _p->d->partialProduct(*m1._p->d, *m2._p->d, i1, i2, j1, j2);
     return *this;
 }
 

@@ -36,9 +36,9 @@ int main(int argc, char *argv[])
     DISP(p1)
     p2 = Matrix<double>::prepareProduct(m1, m2);
     DISP(p2)
-    p2.getProduct(m1, m2, 0, 0, 0, 1);
+    p2.partialProduct(m1, m2, 0, 0, 0, 1);
     DISP(p2)
-    p2.getProduct(m1, m2, 1, 1, 0, 1);
+    p2.partialProduct(m1, m2, 1, 1, 0, 1);
     DISP(p2)
     return 0;
 }
