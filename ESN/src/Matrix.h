@@ -53,6 +53,7 @@ public:
     Matrix<T> &operator*=(const Matrix<T> &other);
     inline Matrix<T> &partialProduct(const Matrix<T> &m1, const Matrix<T> &m2, int i1, int i2, int j1, int j2);
     Matrix<T> transpose() const;
+    T det() const;
     /* Cut and merge operations */
     static Matrix<T> mergeH(const Matrix<T> &m1, const Matrix<T> &m2);
     static Matrix<T> mergeV(const Matrix<T> &m1, const Matrix<T> &m2);
@@ -267,6 +268,12 @@ template <typename T> Matrix<T> Matrix<T>::transpose() const
 {
     ASSERT(_p);
     return Matrix<T>(_p->d->getTranspose());
+}
+
+template <typename T> T Matrix<T>::det() const
+{
+    ASSERT(_p);
+    return _p->d->det();
 }
 
 template <typename T> Matrix<T> Matrix<T>::mergeH(const Matrix<T> &m1, const Matrix<T> &m2)

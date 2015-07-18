@@ -246,6 +246,14 @@
 */
 
 /*!
+    \fn T Matrix<T>::det() const
+
+    Returns the determinant of the matrix.
+
+    \warning Assumes that the matrix is not null and is a square matrix.
+*/
+
+/*!
     \fn Matrix<T> Matrix<T>::mergeH(const Matrix<T> &m1, const Matrix<T> &m2)
 
     Merges horizontally the matrices \a m1 and \a m2 and returns the resulting matrix.

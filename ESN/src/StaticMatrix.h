@@ -13,11 +13,14 @@
 
 #define MATRIX_MEM_CMP 0
 
+#include <QtGlobal>
 #ifdef QT_VERSION /* Are we using Qt? */
   #include <QtGlobal>
   #define ASSERT(x) Q_ASSERT(x)
+  #define ABS(x) qAbs(x)
 #else
   #define ASSERT(x) (void) 0
+  template <typename T> inline T ABS(const T &t) { return t >= 0 ? t : -t; }
   #ifndef NULL
     #define NULL ((void*) 0)
   #endif
@@ -58,6 +61,7 @@ public:
     inline StaticMatrix<T> &operator/=(const T &c) { return ((*this) *= (1 / c)); }
     StaticMatrix<T> &operator*=(const StaticMatrix<T> &other);
     StaticMatrix<T> &partialProduct(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2, int i1, int i2, int j1, int j2);
+    T det() const;
     /* Cut and merge operations */
     StaticMatrix<T> &cut(const StaticMatrix<T> &other, int di = 0, int dj = 0, int si = 0, int sj = 0, int sm = INT_MAX, int sn = INT_MAX);
     /* Other functions */
@@ -320,6 +324,60 @@ template <typename T> StaticMatrix<T> &StaticMatrix<T>::partialProduct(const Sta
         }
     }
     return *this;
+}
+
+template <typename T> T StaticMatrix<T>::det() const
+{
+    ASSERT(_data && (_m == _n));
+    /* As with the multiplication, we will settle for the UL decomposition in O(n^3) */
+    size_t size = _m * _n, swapSize;
+    T *copy = new T[size];
+    T *tmp = new T[_n], maxAbs, tmpT;
+    memcpy((void*) copy, (void*) _data, size * sizeof(T));
+    bool neg = false;
+    int k = _n, lindex = size - 1, index, best, step = _n + 1;
+    while (--k)
+    {
+        maxAbs = ABS(copy[(index = lindex)]);
+        best = index;
+        while ((index -= _n) > 0)
+        {
+            T tmpAbs = ABS(copy[index]);
+            if (tmpAbs > maxAbs)
+            {
+                maxAbs = tmpAbs;
+                best = index;
+            }
+        }
+        if (maxAbs == 0)
+            return (T) 0;
+        if (best != lindex)
+        {
+            swapSize = (k + 1) * sizeof(T);
+            memcpy((void*) tmp, (void*) &copy[lindex - k], swapSize);
+            memcpy((void*) &copy[lindex - k], (void*) &copy[best - k], swapSize);
+            memcpy((void*) &copy[best - k], (void*) tmp, swapSize);
+            neg = !neg;
+        }
+        index = lindex;
+        maxAbs = copy[index];
+        while ((index -= _n) > 0)
+        {
+            tmpT = copy[index];
+            if (tmpT != 0)
+            {
+                for (best = k; best > 0; --best)
+                    copy[index - best] -= tmpT * copy[lindex - best] / maxAbs;
+            }
+        }
+        lindex -= step;
+    }
+    delete[] tmp;
+    tmpT = copy[0];
+    for (index = size - 1; index > 0; index -= step)
+        tmpT *= copy[index];
+    delete[] copy;
+    return (neg ? -tmpT : tmpT);
 }
 
 template <typename T> StaticMatrix<T> &StaticMatrix<T>::cut(const StaticMatrix<T> &other, int di, int dj, int si, int sj, int sm, int sn)
