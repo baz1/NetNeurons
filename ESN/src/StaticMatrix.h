@@ -639,7 +639,7 @@ template <typename T> StaticMatrix<T> *StaticMatrix<T>::getPseudoInverse() const
 {
     ASSERT(_data);
     bool trans;
-    StaticMatrix<T> *A, *tA, *AtA;
+    StaticMatrix<T> *A, *tA, *AtA, *tiAtA, *result;
     if (_n < _m)
     {
         tA = this;
@@ -651,15 +651,18 @@ template <typename T> StaticMatrix<T> *StaticMatrix<T>::getPseudoInverse() const
         trans = false;
     }
     AtA = A->timesTranspose(*A);
-    // TODO
+    if (trans)
+        delete A;
+    // TODO calculate tiAtA = t((AtA)+)
+    delete AtA;
     if (trans)
     {
-        delete A;
+        result = tiAtA->timesTranspose(tA);
     } else {
+        result = tA->timesTranspose(tiAtA);
         delete tA;
     }
-    // TODO
-    return 0;
+    return result;
 }
 
 template <typename T> StaticMatrix<T> *StaticMatrix<T>::mergeH(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2)

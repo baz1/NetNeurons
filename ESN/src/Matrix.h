@@ -291,7 +291,7 @@ template <typename T> Matrix<T> &Matrix<T>::operator/=(const Matrix<T> &other)
     if (_p == other._p)
     {
         /* Speedup in case of trivial division */
-        StaticMatrix<T> *m = StaticMatrix<T>(_p->d->countRows(), _p->d->countCols(), (T) 0);
+        StaticMatrix<T> *m = new StaticMatrix<T>(_p->d->countRows(), _p->d->countCols(), (T) 0);
         if (--_p->n <= 0)
         {
             delete _p->d;
