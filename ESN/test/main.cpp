@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
     // TODO (please, return here later!)
-    Matrix<double> m1(3, 3), m2(3, 3), m3;
+    Matrix<double> m1(3, 3), m2(3, 3), m3(3, 3);
     srand(0);
     for (int i = 0; i < 3; ++i)
     {
@@ -32,5 +32,11 @@ int main(int argc, char *argv[])
     }
     DISP(m1) DISP(m2)
     printf("det(m1) = %lf\n", m1.det());
+    m3.addIdentity();
+    m3 /= m1;
+    DISP(m3)
+    printf("det(m1) = %lf\n", 1/m3.det());
+    m3 *= m1;
+    DISP(m3)
     return 0;
 }
