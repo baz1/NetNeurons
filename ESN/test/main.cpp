@@ -31,12 +31,8 @@ int main(int argc, char *argv[])
         }
     }
     DISP(m1) DISP(m2)
-    printf("det(m1) = %lf\n", m1.det());
-    m3.addIdentity();
+    m3 = m1.timesTranspose(m2);
     m3 /= m1;
-    DISP(m3)
-    printf("det(m1) = %lf\n", 1/m3.det());
-    m3 *= m1;
     DISP(m3)
     return 0;
 }

@@ -246,6 +246,16 @@
 */
 
 /*!
+    \fn Matrix<T> Matrix<T>::timesTranspose(const Matrix<T> &other) const
+
+    Returns the product of this matrix with the transpose of \a other.
+
+    \note This function is faster than doing the two operations separately.
+
+    \warning Assumes that both matrices are not null and that they have the same number of columns.
+*/
+
+/*!
     \fn T Matrix<T>::det() const
 
     Returns the determinant of the matrix.

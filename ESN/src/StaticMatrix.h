@@ -72,6 +72,7 @@ public: /* Use with caution: */
     StaticMatrix<T> *getProduct(const StaticMatrix<T> &other) const;
     static inline StaticMatrix<T> *prepareProduct(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2);
     StaticMatrix<T> *getTranspose() const;
+    StaticMatrix<T> *timesTranspose(const StaticMatrix<T> &other) const;
     StaticMatrix<T> *getPseudoInverse() const;
     /* Cut and merge operations */
     static StaticMatrix<T> *mergeH(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2);
@@ -607,6 +608,33 @@ template <typename T> StaticMatrix<T> *StaticMatrix<T>::getTranspose() const
     return new StaticMatrix<T>(_n, _m, data);
 }
 
+template <typename T> StaticMatrix<T> *StaticMatrix<T>::timesTranspose(const StaticMatrix<T> &other) const
+{
+    ASSERT(_data && other._data);
+    ASSERT(_n == other._n);
+    int index, i1, si2, i2, k;
+    T *data = new T[(index = _m * other._m)];
+    i1 = _m * _n;
+    si2 = other._m * _n;
+    while (i1)
+    {
+        i1 -= _n;
+        i2 = si2;
+        while (i2)
+        {
+            i2 -= _n;
+            data[--index] = 0;
+            k = _n;
+            while (k)
+            {
+                --k;
+                data[index] += _data[i1 + k] * other._data[i2 + k];
+            }
+        }
+    }
+    return new StaticMatrix<T>(_m, other._m, data);
+}
+
 template <typename T> StaticMatrix<T> *StaticMatrix<T>::getPseudoInverse() const
 {
     ASSERT(_data);
@@ -650,6 +678,7 @@ template <typename T> StaticMatrix<T> *StaticMatrix<T>::getPseudoInverse() const
     if (trans)
         delete input;
     // TODO
+    return 0;
 }
 
 template <typename T> StaticMatrix<T> *StaticMatrix<T>::mergeH(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2)

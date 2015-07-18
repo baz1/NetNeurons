@@ -52,8 +52,9 @@ public:
     inline Matrix<T> &operator/=(const T &c) { return ((*this) *= (1 / c)); }
     Matrix<T> &operator*=(const Matrix<T> &other);
     inline Matrix<T> &partialProduct(const Matrix<T> &m1, const Matrix<T> &m2, int i1, int i2, int j1, int j2);
-    Matrix<T> transpose() const;
-    T det() const;
+    inline Matrix<T> transpose() const;
+    inline Matrix<T> timesTranspose(const Matrix<T> &other) const;
+    inline T det() const;
     Matrix<T> &operator/=(const Matrix<T> &other);
     /* Cut and merge operations */
     static Matrix<T> mergeH(const Matrix<T> &m1, const Matrix<T> &m2);
@@ -265,13 +266,19 @@ template <typename T> inline Matrix<T> &Matrix<T>::partialProduct(const Matrix<T
     return *this;
 }
 
-template <typename T> Matrix<T> Matrix<T>::transpose() const
+template <typename T> inline Matrix<T> Matrix<T>::transpose() const
 {
     ASSERT(_p);
     return Matrix<T>(_p->d->getTranspose());
 }
 
-template <typename T> T Matrix<T>::det() const
+template <typename T> inline Matrix<T> Matrix<T>::timesTranspose(const Matrix<T> &other) const
+{
+    ASSERT(_p && other._p);
+    return Matrix<T>(_p->d->timesTranspose(*other._p->d));
+}
+
+template <typename T> inline T Matrix<T>::det() const
 {
     ASSERT(_p);
     return _p->d->det();
