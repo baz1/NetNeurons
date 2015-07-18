@@ -72,6 +72,7 @@ public: /* Use with caution: */
     StaticMatrix<T> *getProduct(const StaticMatrix<T> &other) const;
     static inline StaticMatrix<T> *prepareProduct(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2);
     StaticMatrix<T> *getTranspose() const;
+    StaticMatrix<T> *getPseudoInverse() const;
     /* Cut and merge operations */
     static StaticMatrix<T> *mergeH(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2);
     static StaticMatrix<T> *mergeV(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2);
@@ -604,6 +605,51 @@ template <typename T> StaticMatrix<T> *StaticMatrix<T>::getTranspose() const
         }
     }
     return new StaticMatrix<T>(_n, _m, data);
+}
+
+template <typename T> StaticMatrix<T> *StaticMatrix<T>::getPseudoInverse() const
+{
+    ASSERT(_data);
+    bool trans;
+    StaticMatrix<T> *input;
+    int n, size = _n * _m, index, i, j, i1, i2, k;
+    if (_n < _m)
+    {
+        /* We will work with the transpose instead of reverting all the algorithm, */
+        /* in order to take advantage of some cache speedup in the next calculation. */
+        input = getTranspose();
+        n = _n;
+        trans = true;
+    } else {
+        input = this;
+        n = _m;
+        trans = false;
+    }
+    T *AA = new T[(index = n * n)];
+    i1 = size;
+    i = n;
+    while (i)
+    {
+        --i;
+        i1 -= input->_n;
+        i2 = size;
+        j = n;
+        while (j)
+        {
+            --j;
+            i2 -= input->_n;
+            AA[--index] = 0;
+            k = input->_n;
+            while (k)
+            {
+                --k;
+                AA[index] += input->_data[i1 + k] * input->_data[i2 + k];
+            }
+        }
+    }
+    if (trans)
+        delete input;
+    // TODO
 }
 
 template <typename T> StaticMatrix<T> *StaticMatrix<T>::mergeH(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2)
