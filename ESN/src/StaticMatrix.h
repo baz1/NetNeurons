@@ -112,8 +112,12 @@ template <typename T> inline StaticMatrix<T>::StaticMatrix(int m, int n, T value
     ASSERT_INT(((unsigned long long) m) * ((unsigned long long) n));
     size_t size = m * n;
     _data = new T[size];
-    while (size)
-        _data[--size] = value;
+    while (n)
+        _data[--n] = value;
+    n = size;
+    size = _n * sizeof(T);
+    while (--m)
+        memcpy((void*) &_data[n -= _n], (void*) _data, size);
 }
 
 template <typename T> inline StaticMatrix<T>::~StaticMatrix()
@@ -140,8 +144,13 @@ template <typename T> inline void StaticMatrix<T>::fill(T value)
 {
     ASSERT(_data);
     size_t size = _m * _n;
-    while (size)
-        _data[--size] = value;
+    int j = _n, i = _m;
+    while (j)
+        _data[--j] = value;
+    j = size;
+    size = _n * sizeof(T);
+    while (--i)
+        memcpy((void*) &_data[j -= _n], (void*) _data, size);
 }
 
 template <typename T> inline void StaticMatrix<T>::fillZero()
