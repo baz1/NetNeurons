@@ -248,7 +248,7 @@ template <typename T> Matrix<T> &Matrix<T>::operator*=(const T &c)
 template <typename T> Matrix<T> &Matrix<T>::operator*=(const Matrix<T> &other)
 {
     ASSERT(_p && other._p);
-    StaticMatrix<T> *tmp = _p->d->getProduct(*other._p->d);
+    StaticMatrix<T> *tmp = _p->d->getProduct(*other._p->d); // No pb if the same pointer.
     if (--_p->n <= 0)
     {
         delete _p->d;
@@ -262,7 +262,8 @@ template <typename T> inline Matrix<T> &Matrix<T>::partialProduct(const Matrix<T
 {
     ASSERT(_p && m1._p && m2._p);
     detach();
-    _p->d->partialProduct(*m1._p->d, *m2._p->d, i1, i2, j1, j2);
+    ASSERT((_p != m1._p) && (_p != m2._p)); // Avoid doing nasty stuff
+    _p->d->partialProduct(*m1._p->d, *m2._p->d, i1, i2, j1, j2); // No pb if m1 and m2 hold the same pointer.
     return *this;
 }
 
@@ -275,7 +276,7 @@ template <typename T> inline Matrix<T> Matrix<T>::transpose() const
 template <typename T> inline Matrix<T> Matrix<T>::timesTranspose(const Matrix<T> &other) const
 {
     ASSERT(_p && other._p);
-    return Matrix<T>(_p->d->timesTranspose(*other._p->d));
+    return Matrix<T>(_p->d->timesTranspose(*other._p->d)); // No pb if the same pointer.
 }
 
 template <typename T> inline T Matrix<T>::det() const
@@ -287,28 +288,41 @@ template <typename T> inline T Matrix<T>::det() const
 template <typename T> Matrix<T> &Matrix<T>::operator/=(const Matrix<T> &other)
 {
     ASSERT(_p && other._p);
-    detach();
-    (*_p->d) /= (*other._p->d);
+    if (_p == other._p)
+    {
+        /* Speedup in case of trivial division */
+        StaticMatrix<T> *m = StaticMatrix<T>(_p->d->countRows(), _p->d->countCols(), (T) 0);
+        if (--_p->n <= 0)
+        {
+            delete _p->d;
+            delete _p;
+        }
+        m->addIdentity();
+        _p = new Data(m);
+    } else {
+        detach();
+        (*_p->d) /= (*other._p->d); // No pb if the same pointer.
+    }
     return *this;
 }
 
 template <typename T> Matrix<T> Matrix<T>::mergeH(const Matrix<T> &m1, const Matrix<T> &m2)
 {
     ASSERT(m1._p && m2._p);
-    return Matrix<T>(StaticMatrix<T>::mergeH(*m1._p->d, *m2._p->d));
+    return Matrix<T>(StaticMatrix<T>::mergeH(*m1._p->d, *m2._p->d)); // No pb if the same pointer.
 }
 
 template <typename T> Matrix<T> Matrix<T>::mergeV(const Matrix<T> &m1, const Matrix<T> &m2)
 {
     ASSERT(m1._p && m2._p);
-    return Matrix<T>(StaticMatrix<T>::mergeV(*m1._p->d, *m2._p->d));
+    return Matrix<T>(StaticMatrix<T>::mergeV(*m1._p->d, *m2._p->d)); // No pb if the same pointer.
 }
 
 template <typename T> inline Matrix<T> &Matrix<T>::cut(const Matrix<T> &other, int di, int dj, int si, int sj, int sm, int sn)
 {
     ASSERT(_p && other._p);
     detach();
-    _p->d->cut(*other._p->d, di, dj, si, sj, sm, sn);
+    _p->d->cut(*other._p->d, di, dj, si, sj, sm, sn); // Expected behavior if the same pointer.
     return *this;
 }
 
@@ -325,7 +339,7 @@ template <typename T> void Matrix<T>::print(FILE *stream, const char *(*toString
 template <typename T> Matrix<T> Matrix<T>::prepareProduct(const Matrix<T> &m1, const Matrix<T> &m2)
 {
     ASSERT(m1._p && m2._p);
-    return Matrix<T>(StaticMatrix<T>::prepareProduct(*m1._p->d, *m2._p->d));
+    return Matrix<T>(StaticMatrix<T>::prepareProduct(*m1._p->d, *m2._p->d)); // No pb if the same pointer.
 }
 
 template <typename T> void Matrix<T>::deref()

@@ -639,44 +639,25 @@ template <typename T> StaticMatrix<T> *StaticMatrix<T>::getPseudoInverse() const
 {
     ASSERT(_data);
     bool trans;
-    StaticMatrix<T> *input;
-    int n, size = _n * _m, index, i, j, i1, i2, k;
+    StaticMatrix<T> *A, *tA, *AtA;
     if (_n < _m)
     {
-        /* We will work with the transpose instead of reverting all the algorithm, */
-        /* in order to take advantage of some cache speedup in the next calculation. */
-        input = getTranspose();
-        n = _n;
+        tA = this;
+        A = tA->getTranspose();
         trans = true;
     } else {
-        input = this;
-        n = _m;
+        A = this;
+        tA = A->getTranspose();
         trans = false;
     }
-    T *AA = new T[(index = n * n)];
-    i1 = size;
-    i = n;
-    while (i)
-    {
-        --i;
-        i1 -= input->_n;
-        i2 = size;
-        j = n;
-        while (j)
-        {
-            --j;
-            i2 -= input->_n;
-            AA[--index] = 0;
-            k = input->_n;
-            while (k)
-            {
-                --k;
-                AA[index] += input->_data[i1 + k] * input->_data[i2 + k];
-            }
-        }
-    }
+    AtA = A->timesTranspose(*A);
+    // TODO
     if (trans)
-        delete input;
+    {
+        delete A;
+    } else {
+        delete tA;
+    }
     // TODO
     return 0;
 }
