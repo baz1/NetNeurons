@@ -647,7 +647,6 @@ template <typename T> StaticMatrix<T> *StaticMatrix<T>::getPseudoInverse() const
         trans = true;
     } else {
         A = this;
-        tA = A->getTranspose();
         trans = false;
     }
     AtA = A->timesTranspose(*A);
@@ -659,6 +658,7 @@ template <typename T> StaticMatrix<T> *StaticMatrix<T>::getPseudoInverse() const
     {
         result = tiAtA->timesTranspose(tA);
     } else {
+        tA = A->getTranspose();
         result = tA->timesTranspose(tiAtA);
         delete tA;
     }
