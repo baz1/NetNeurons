@@ -143,12 +143,11 @@ template <typename T> inline T &StaticMatrix<T>::operator()(const quint16 &i, co
 template <typename T> inline void StaticMatrix<T>::fill(T value)
 {
     ASSERT(_data);
-    size_t size = _m * _n;
     int j = _n, i = _m;
     while (j)
         _data[--j] = value;
-    j = size;
-    size = _n * sizeof(T);
+    j = _m * _n;
+    size_t size = _n * sizeof(T);
     while (--i)
         memcpy((void*) &_data[j -= _n], (void*) _data, size);
 }
