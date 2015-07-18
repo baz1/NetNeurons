@@ -254,6 +254,14 @@
 */
 
 /*!
+    \fn Matrix<T> &Matrix<T>::operator/=(const Matrix<T> &other)
+
+    Does a left-side multiplication with the inverse of \a other, and returns a reference to the modified matrix.
+
+    \warning Assumes that both matrices are not null, that their sizes match and that \a other is invertible.
+*/
+
+/*!
     \fn Matrix<T> Matrix<T>::mergeH(const Matrix<T> &m1, const Matrix<T> &m2)
 
     Merges horizontally the matrices \a m1 and \a m2 and returns the resulting matrix.
