@@ -63,6 +63,9 @@ public:
     StaticMatrix<T> &partialProduct(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2, int i1, int i2, int j1, int j2);
     T det() const;
     StaticMatrix<T> &operator/=(const StaticMatrix<T> &other);
+    /* Norms */
+    T norm1() const;
+    T norminf() const;
     /* Cut and merge operations */
     StaticMatrix<T> &cut(const StaticMatrix<T> &other, int di = 0, int dj = 0, int si = 0, int sj = 0, int sm = INT_MAX, int sn = INT_MAX);
     /* Other functions */
@@ -73,7 +76,7 @@ public: /* Use with caution: */
     static inline StaticMatrix<T> *prepareProduct(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2);
     StaticMatrix<T> *getTranspose() const;
     StaticMatrix<T> *timesTranspose(const StaticMatrix<T> &other) const;
-    StaticMatrix<T> *getPseudoInverse(const T &negligible = (T) 0) const;
+    StaticMatrix<T> *getPseudoInverse(const T &negligible = 0) const;
     /* Cut and merge operations */
     static StaticMatrix<T> *mergeH(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2);
     static StaticMatrix<T> *mergeV(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2);
@@ -470,6 +473,47 @@ template <typename T> StaticMatrix<T> &StaticMatrix<T>::operator/=(const StaticM
     delete[] tmp;
     delete[] copy;
     return *this;
+}
+
+template <typename T> T StaticMatrix<T>::norm1() const
+{
+    ASSERT(_data);
+    T max = (T) 0, sum;
+    int i1 = _n, si2 = _n * (_m - 1), i2;
+    while (i1)
+    {
+        --i1;
+        sum = (T) 0;
+        i2 = si2;
+        while (true)
+        {
+            sum += ABS(_data[i1 + i2]);
+            if (!i2)
+                break;
+            i2 -= _n;
+        }
+        if (sum > max)
+            max = sum;
+    }
+    return max;
+}
+
+template <typename T> T StaticMatrix<T>::norminf() const
+{
+    ASSERT(_data);
+    T max = (T) 0, sum;
+    int i1 = _n * _m, i2;
+    while (i1)
+    {
+        i1 -= _n;
+        sum = (T) 0;
+        i2 = _n;
+        while (i2)
+            sum += ABS(_data[i1 + (--i2)]);
+        if (sum > max)
+            max = sum;
+    }
+    return max;
 }
 
 template <typename T> StaticMatrix<T> &StaticMatrix<T>::cut(const StaticMatrix<T> &other, int di, int dj, int si, int sj, int sm, int sn)

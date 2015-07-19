@@ -56,7 +56,10 @@ public:
     inline Matrix<T> timesTranspose(const Matrix<T> &other) const;
     inline T det() const;
     Matrix<T> &operator/=(const Matrix<T> &other);
-    inline Matrix<T> pseudoinverse(const T &negligible = (T) 0) const;
+    inline Matrix<T> pseudoinverse(const T &negligible = 0) const;
+    /* Norms */
+    inline T norm1() const;
+    inline T norminf() const;
     /* Cut and merge operations */
     static Matrix<T> mergeH(const Matrix<T> &m1, const Matrix<T> &m2);
     static Matrix<T> mergeV(const Matrix<T> &m1, const Matrix<T> &m2);
@@ -311,6 +314,18 @@ template <typename T> inline Matrix<T> Matrix<T>::pseudoinverse(const T &negligi
 {
     ASSERT(_p);
     return Matrix<T>(_p->d->getPseudoInverse(negligible));
+}
+
+template <typename T> inline T Matrix<T>::norm1() const
+{
+    ASSERT(_p);
+    return _p->d->norm1();
+}
+
+template <typename T> inline T Matrix<T>::norminf() const
+{
+    ASSERT(_p);
+    return _p->d->norminf();
 }
 
 template <typename T> Matrix<T> Matrix<T>::mergeH(const Matrix<T> &m1, const Matrix<T> &m2)

@@ -272,6 +272,36 @@
 */
 
 /*!
+    \fn Matrix<T> Matrix<T>::pseudoinverse(const T &negligible) const
+
+    Returns the Moore–Penrose pseudoinverse of this matrix, using \a negligible as precision for equality tests with zero.
+
+    \warning Assumes that the matrix is not null.
+*/
+
+/*!
+    \fn T Matrix<T>::norm1() const
+
+    Calculates the norm 1 of this matrix, that is the maximum absolute column sum of the matrix.
+
+    \warning Assumes that the matrix is not null.
+
+    \note The infinite norm \c norminf is slightly faster than this function.
+
+    \sa norminf()
+*/
+
+/*!
+    \fn T Matrix<T>::norminf() const
+
+    Calculates the infinite norm of this matrix, that is the maximum absolute row sum of the matrix.
+
+    \warning Assumes that the matrix is not null.
+
+    \sa norm1()
+*/
+
+/*!
     \fn Matrix<T> Matrix<T>::mergeH(const Matrix<T> &m1, const Matrix<T> &m2)
 
     Merges horizontally the matrices \a m1 and \a m2 and returns the resulting matrix.
