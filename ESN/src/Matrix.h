@@ -56,6 +56,7 @@ public:
     inline Matrix<T> timesTranspose(const Matrix<T> &other) const;
     inline T det() const;
     Matrix<T> &operator/=(const Matrix<T> &other);
+    inline Matrix<T> pseudoinverse(const T &negligible = (T) 0) const;
     /* Cut and merge operations */
     static Matrix<T> mergeH(const Matrix<T> &m1, const Matrix<T> &m2);
     static Matrix<T> mergeV(const Matrix<T> &m1, const Matrix<T> &m2);
@@ -304,6 +305,12 @@ template <typename T> Matrix<T> &Matrix<T>::operator/=(const Matrix<T> &other)
         (*_p->d) /= (*other._p->d); // No pb if the same pointer.
     }
     return *this;
+}
+
+template <typename T> inline Matrix<T> Matrix<T>::pseudoinverse(const T &negligible) const
+{
+    ASSERT(_p);
+    return Matrix<T>(_p->d->getPseudoInverse(negligible));
 }
 
 template <typename T> Matrix<T> Matrix<T>::mergeH(const Matrix<T> &m1, const Matrix<T> &m2)
