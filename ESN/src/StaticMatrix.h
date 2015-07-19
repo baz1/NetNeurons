@@ -44,6 +44,7 @@ public:
     inline T* data() { return _data; }
     inline void fill(T value = 0);
     inline void fillZero();
+    bool isZero(const T &negligible = 0) const;
     inline int countRows() const { return _m; }
     inline int countCols() const { return _n; }
     inline StaticMatrix<T> &addIdentity();
@@ -60,6 +61,7 @@ public:
     StaticMatrix<T> &operator*=(const T &c);
     inline StaticMatrix<T> &operator/=(const T &c) { return ((*this) *= (1 / c)); }
     StaticMatrix<T> &operator*=(const StaticMatrix<T> &other);
+    inline StaticMatrix<T> operator*(const StaticMatrix<T> &other) const;
     StaticMatrix<T> &partialProduct(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2, int i1, int i2, int j1, int j2);
     T det() const;
     StaticMatrix<T> &operator/=(const StaticMatrix<T> &other);
@@ -161,6 +163,18 @@ template <typename T> inline void StaticMatrix<T>::fillZero()
 {
     ASSERT(_data);
     memset((void*) _data, 0, _m * _n * sizeof(T));
+}
+
+template <typename T> bool StaticMatrix<T>::isZero(const T &negligible) const
+{
+    ASSERT(_data);
+    int index = _m * _n;
+    while (index)
+    {
+        if (ABS(_data[--index]) > negligible)
+            return false;
+    }
+    return true;
 }
 
 template <typename T> inline StaticMatrix<T> &StaticMatrix<T>::addIdentity()
@@ -311,6 +325,14 @@ template <typename T> StaticMatrix<T> &StaticMatrix<T>::operator*=(const StaticM
     _n = other._n;
     _data = data;
     return *this;
+}
+
+template <typename T> inline StaticMatrix<T> StaticMatrix<T>::operator*(const StaticMatrix<T> &other) const
+{
+    ASSERT(_data && other._data);
+    StaticMatrix<T> result(*this);
+    result *= other;
+    return result;
 }
 
 template <typename T> StaticMatrix<T> &StaticMatrix<T>::partialProduct(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2, int i1, int i2, int j1, int j2)

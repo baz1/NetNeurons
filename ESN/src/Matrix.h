@@ -35,6 +35,7 @@ public:
     inline T* data() { detach(); return _p ? _p->d->data() : NULL; }
     void fill(T value = 0);
     inline void fillZero();
+    inline bool isZero(const T &negligible = 0) const;
     inline int countRows() const { return _p ? _p->d->countRows() : 0; }
     inline int countCols() const { return _p ? _p->d->countCols() : 0; }
     Matrix<T> &addIdentity();
@@ -51,6 +52,7 @@ public:
     Matrix<T> &operator*=(const T &c);
     inline Matrix<T> &operator/=(const T &c) { return ((*this) *= (1 / c)); }
     Matrix<T> &operator*=(const Matrix<T> &other);
+    Matrix<T> operator*(const Matrix<T> &other) const;
     inline Matrix<T> &partialProduct(const Matrix<T> &m1, const Matrix<T> &m2, int i1, int i2, int j1, int j2);
     inline Matrix<T> transpose() const;
     inline Matrix<T> timesTranspose(const Matrix<T> &other) const;
@@ -161,6 +163,12 @@ template <typename T> inline void Matrix<T>::fillZero()
     }
 }
 
+template <typename T> inline bool Matrix<T>::isZero(const T &negligible) const
+{
+    ASSERT(_p);
+    return _p->d->isZero(negligible);
+}
+
 template <typename T> Matrix<T> &Matrix<T>::addIdentity()
 {
     detach();
@@ -260,6 +268,12 @@ template <typename T> Matrix<T> &Matrix<T>::operator*=(const Matrix<T> &other)
     }
     _p = new Data(tmp);
     return *this;
+}
+
+template <typename T> Matrix<T> Matrix<T>::operator*(const Matrix<T> &other) const
+{
+    ASSERT(_p && other._p);
+    return Matrix<T>(_p->d->getProduct(*other._p->d)); // No pb if the same pointer.
 }
 
 template <typename T> inline Matrix<T> &Matrix<T>::partialProduct(const Matrix<T> &m1, const Matrix<T> &m2, int i1, int i2, int j1, int j2)

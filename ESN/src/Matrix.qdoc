@@ -114,6 +114,14 @@
 */
 
 /*!
+    \fn bool Matrix<T>::isZero(const T &negligible) const
+
+    Returns true is this matrix only contains only zeros, with the precision \a negligible.
+
+    \warning Assumes that the matrix is not null.
+*/
+
+/*!
     \fn int Matrix<T>::countRows() const
 
     Returns the number of rows of the matrix, or 0 if the matrix is null.
@@ -218,6 +226,14 @@
     \fn Matrix<T> &Matrix<T>::operator*=(const Matrix<T> &other)
 
     Multiplies this matrix with \a other, and returns a reference to it.
+
+    \warning Assumes that both matrices are not null, and that their sizes match.
+*/
+
+/*!
+    \fn Matrix<T> Matrix<T>::operator*(const Matrix<T> &other) const
+
+    Returns the product of this matrix and \a other.
 
     \warning Assumes that both matrices are not null, and that their sizes match.
 */
