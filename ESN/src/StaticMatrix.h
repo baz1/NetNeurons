@@ -65,6 +65,7 @@ public:
     StaticMatrix<T> &partialProduct(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2, int i1, int i2, int j1, int j2);
     T det() const;
     StaticMatrix<T> &operator/=(const StaticMatrix<T> &other);
+    StaticMatrix<T> &pseudoInverse(const T &negligible = 0);
     /* Norms */
     T norm1() const;
     T norminf() const;
@@ -78,7 +79,6 @@ public: /* Use with caution: */
     static inline StaticMatrix<T> *prepareProduct(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2);
     StaticMatrix<T> *getTranspose() const;
     StaticMatrix<T> *timesTranspose(const StaticMatrix<T> &other) const;
-    StaticMatrix<T> *getPseudoInverse(const T &negligible = 0) const;
     /* Cut and merge operations */
     static StaticMatrix<T> *mergeH(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2);
     static StaticMatrix<T> *mergeV(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2);
@@ -497,6 +497,12 @@ template <typename T> StaticMatrix<T> &StaticMatrix<T>::operator/=(const StaticM
     return *this;
 }
 
+template <typename T> StaticMatrix<T> &StaticMatrix<T>::pseudoInverse(const T &negligible = 0)
+{
+    // TODO
+    return *this;
+}
+
 template <typename T> T StaticMatrix<T>::norm1() const
 {
     ASSERT(_data);
@@ -701,6 +707,7 @@ template <typename T> StaticMatrix<T> *StaticMatrix<T>::timesTranspose(const Sta
     return new StaticMatrix<T>(_m, other._m, data);
 }
 
+/*
 template <typename T> StaticMatrix<T> *StaticMatrix<T>::getPseudoInverse(const T &negligible) const
 {
     ASSERT(_data);
@@ -998,6 +1005,7 @@ template <typename T> StaticMatrix<T> *StaticMatrix<T>::getPseudoInverse(const T
     }
     return result;
 }
+*/
 
 template <typename T> StaticMatrix<T> *StaticMatrix<T>::mergeH(const StaticMatrix<T> &m1, const StaticMatrix<T> &m2)
 {

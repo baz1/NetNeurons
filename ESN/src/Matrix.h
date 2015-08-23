@@ -9,6 +9,8 @@
 
 #include "StaticMatrix.h"
 
+#define PINV_TRANSPOSE_DIFF 5
+
 template <typename T> class Matrix
 {
 private:
@@ -58,7 +60,7 @@ public:
     inline Matrix<T> timesTranspose(const Matrix<T> &other) const;
     inline T det() const;
     Matrix<T> &operator/=(const Matrix<T> &other);
-    inline Matrix<T> pseudoinverse(const T &negligible = 0) const;
+    Matrix<T> &pseudoInverse(const T &negligible = 0);
     /* Norms */
     inline T norm1() const;
     inline T norminf() const;
@@ -324,10 +326,24 @@ template <typename T> Matrix<T> &Matrix<T>::operator/=(const Matrix<T> &other)
     return *this;
 }
 
-template <typename T> inline Matrix<T> Matrix<T>::pseudoinverse(const T &negligible) const
+template <typename T> Matrix<T> &Matrix<T>::pseudoInverse(const T &negligible)
 {
     ASSERT(_p);
-    return Matrix<T>(_p->d->getPseudoInverse(negligible));
+    /* Transpose if m >> n for efficiency reasons */
+    if (_p->d->countRows() > _p->d->countCols() + PINV_TRANSPOSE_DIFF)
+    {
+        StaticMatrix<T> *m = _p->d->getTranspose();
+        if (--_p->n <= 0)
+        {
+            delete _p->d;
+            delete _p;
+        }
+        _p = new Data(m);
+    } else {
+        detach();
+    }
+    _p->d->pseudoInverse(negligible);
+    return *this;
 }
 
 template <typename T> inline T Matrix<T>::norm1() const
