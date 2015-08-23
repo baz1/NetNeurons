@@ -497,9 +497,32 @@ template <typename T> StaticMatrix<T> &StaticMatrix<T>::operator/=(const StaticM
     return *this;
 }
 
-template <typename T> StaticMatrix<T> &StaticMatrix<T>::pseudoInverse(const T &negligible = 0)
+template <typename T> StaticMatrix<T> &StaticMatrix<T>::pseudoInverse(const T &negligible)
 {
+    /* We will assume - only for efficiency reasons - that _n > _m */
+    ASSERT(_data);
+    ASSERT(negligible >= 0);
+    size_t size = _m * _m, swapSize1, swapSize2 = _m * sizeof(T);
+    T *V = new T[size];
+    T *tmp = &V[size];
+    int i1 = _m, step = _m + 1;
+    while (i1)
+        V[--i1] = 0;
+    while (tmp != V)
+        memcpy((void*) tmp, (void*) V, swapSize2);
+    i1 = _m * step;
+    while (i1)
+        V[i1 -= step] = 1;
+    tmp = new T[_m];
+    int *cols = new int[i1 = _n];
+    while (i1)
+    {
+        --i1;
+        cols[i1] = i1;
+    }
     // TODO
+    delete[] tmp;
+    delete[] V;
     return *this;
 }
 
