@@ -181,6 +181,8 @@ template <typename T> Matrix<T> &Matrix<T>::addIdentity()
 
 template <typename T> Matrix<T> &Matrix<T>::operator=(const Matrix<T> &other)
 {
+    if (_p == other._p)
+        return *this;
     deref();
     _p = other._p;
     if (_p)
