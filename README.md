@@ -11,6 +11,8 @@ in any project that uses them. The Makefile only exists to generate the document
 Echo State Networks are a type of recurrent neural network.
 This library enables a basic usage of this type of networks.
 
+However, it is **still at a development stage**.
+
 ## MLP - MultiLayered Perceptron
 
 ### Presentation

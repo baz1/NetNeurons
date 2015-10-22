@@ -202,11 +202,7 @@ template <typename T> StaticMatrix<T> &StaticMatrix<T>::operator=(const StaticMa
         delete[] _data;
         _data = new T[size];
     }
-    while (size)
-    {
-        --size;
-        _data[size] = other._data[size];
-    }
+    memcpy((void*) _data, (void*) other._data, size * sizeof(T));
     return *this;
 }
 
@@ -499,29 +495,93 @@ template <typename T> StaticMatrix<T> &StaticMatrix<T>::operator/=(const StaticM
 
 template <typename T> StaticMatrix<T> &StaticMatrix<T>::pseudoInverse(const T &negligible)
 {
-    /* We will assume - only for efficiency reasons - that _n > _m */
     ASSERT(_data);
     ASSERT(negligible >= 0);
-    size_t size = _m * _m, swapSize1, swapSize2 = _m * sizeof(T);
-    T *V = new T[size];
-    T *tmp = &V[size];
-    int i1 = _m, step = _m + 1;
-    while (i1)
-        V[--i1] = 0;
-    while (tmp != V)
-        memcpy((void*) tmp, (void*) V, swapSize2);
-    i1 = _m * step;
-    while (i1)
-        V[i1 -= step] = 1;
-    tmp = new T[_m];
-    int *cols = new int[i1 = _n];
-    while (i1)
-    {
-        --i1;
-        cols[i1] = i1;
+    T *V;
+    { /* Initialize V to I_m, and allocate indexes  */
+        int step;
+        size_t size;
+        V = new T[(size = _m * _m)];
+        memset((void*) V, 0, size * sizeof(T));
+        step = _m + 1;
+        --size;
+        V[size] = 1;
+        while (size)
+            V[size -= step] = 1;
+    }
+    int *indexes = new int[_n], current_index = 0;
+    int x = 0, y = 0;
+    { /* Try to invert this matrix, thus modifying V */
+        T *swap1 = new T[_n], swap2 = new T[_m];
+        size_t swapsize1, swapsize2 = _m * sizeof(T);
+        int lindex = 0, index, size = _n * _m;
+        int itmp1, itmp2, itmp3, itmp4;
+        T maxAbs, temp;
+        while (true)
+        {
+            maxAbs = ABS(_data[(index = lindex)]);
+            itmp4  = index;
+            itmp3 = (itmp1 = y);
+            while ((index += _n) < size)
+            {
+                ++itmp1;
+                temp = ABS(_data[index]);
+                if (temp > maxAbs)
+                {
+                    maxAbs = temp;
+                    itmp4 = index;
+                    itmp3 = itmp1;
+                }
+            }
+            if (maxAbs <= negligible)
+            {
+                indexes[current_index++] = y;
+                if (++x >= _n)
+                    break;
+                ++lindex;
+                continue;
+            }
+            itmp1 = _m * y;
+            if (itmp4 != lindex)
+            {
+                swapsize1 = _n - x;
+                memcpy((void*) swap1, (void*) &_data[lindex], swapsize1);
+                memcpy((void*) &_data[lindex], (void*) &_data[itmp4], swapsize1);
+                memcpy((void*) &_data[itmp4], (void*) swap1, swapsize1);
+                itmp2 = _m * itmp3;
+                memcpy((void*) swap2, (void*) &V[itmp1], swapsize2);
+                memcpy((void*) &V[itmp1], (void*) &V[itmp2], swapsize2);
+                memcpy((void*) &V[itmp2], (void*) swap2, swapsize2);
+            }
+            maxAbs = _data[lindex];
+            if (maxAbs != 1)
+            {
+                itmp2 = lindex + _n - x;
+                while (--itmp2 > lindex)
+                    _data[itmp2] /= maxAbs;
+                itmp2 = itmp1 + _m;
+                do {
+                    V[itmp2] /= maxAbs;
+                } while ((--itmp2) >= itmp1);
+            }
+            for (itmp3 = size + x, itmp4 = _m * _m; (itmp3 -= _n, itmp4 -= _m) >= 0;)
+            {
+                if (itmp3 == lindex)
+                    continue;
+                temp = _data[itmp3];
+                if (temp == 0)
+                    continue;
+                for (itmp2 = _n - x; --itmp2 > 0;)
+                    _data[itmp3 + itmp2] -= temp * _data[lindex + itmp2];
+                for (itmp2 = _m; --itmp2 > 0;)
+                    V[itmp4 + itmp2] -= temp * V[itmp1 + itmp2];
+            }
+            if (((++y, ++x) >= _n) || (y >= _m))
+                break;
+            lindex += _n + 1;
+        }
     }
     // TODO
-    delete[] tmp;
     delete[] V;
     return *this;
 }

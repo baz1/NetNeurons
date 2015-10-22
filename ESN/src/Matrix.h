@@ -60,7 +60,7 @@ public:
     inline Matrix<T> timesTranspose(const Matrix<T> &other) const;
     inline T det() const;
     Matrix<T> &operator/=(const Matrix<T> &other);
-    Matrix<T> &pseudoInverse(const T &negligible = 0);
+    inline Matrix<T> &pseudoInverse(const T &negligible = 0);
     /* Norms */
     inline T norm1() const;
     inline T norminf() const;
@@ -328,22 +328,10 @@ template <typename T> Matrix<T> &Matrix<T>::operator/=(const Matrix<T> &other)
     return *this;
 }
 
-template <typename T> Matrix<T> &Matrix<T>::pseudoInverse(const T &negligible)
+template <typename T> inline Matrix<T> &Matrix<T>::pseudoInverse(const T &negligible)
 {
     ASSERT(_p);
-    /* Transpose if m >> n for efficiency reasons */
-    if (_p->d->countRows() > _p->d->countCols() + PINV_TRANSPOSE_DIFF)
-    {
-        StaticMatrix<T> *m = _p->d->getTranspose();
-        if (--_p->n <= 0)
-        {
-            delete _p->d;
-            delete _p;
-        }
-        _p = new Data(m);
-    } else {
-        detach();
-    }
+    detach();
     _p->d->pseudoInverse(negligible);
     return *this;
 }
