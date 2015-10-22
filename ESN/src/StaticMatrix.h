@@ -596,14 +596,18 @@ template <typename T> StaticMatrix<T> &StaticMatrix<T>::pseudoInverse(const T &n
         return *this;
     }
     indexes[current_index] = -1;
-    { /* Initialize the result matrix to some intermediate value */
+    {
+        /* Initialize the result matrix to some intermediate value */
         size_t size = _n + _m - y, sqsize = sq(size), cpysize = _m * sizeof(T);
         result = new T[sqsize];
         memset((void*) result, 0, sqsize * sizeof(T));
         int i = 0, j = _m, k = 0, l = 0;
         while (k < sqsize)
         {
-            if ((indexes[l] == i) || (i >= _m))
+            if (i >= _m)
+            {
+                result[k + j++] = 1;
+            } else if (indexes[l] == i)
             {
                 result[k + j++] = 1;
                 ++l;
@@ -612,6 +616,9 @@ template <typename T> StaticMatrix<T> &StaticMatrix<T>::pseudoInverse(const T &n
             }
             k += size;
         }
+        /* Allocate and initialize the right-hand matrix */
+        T *Rm = new T[size * (_m - y)];
+        // TODO
     }
     // TODO
     delete[] indexes;
