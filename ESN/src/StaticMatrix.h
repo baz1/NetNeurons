@@ -493,11 +493,13 @@ template <typename T> StaticMatrix<T> &StaticMatrix<T>::operator/=(const StaticM
     return *this;
 }
 
+template <typename T> inline T sq<T>(T a) { return a * a; }
+
 template <typename T> StaticMatrix<T> &StaticMatrix<T>::pseudoInverse(const T &negligible)
 {
     ASSERT(_data);
     ASSERT(negligible >= 0);
-    T *V;
+    T *V, *result;
     { /* Initialize V to I_m, and allocate indexes  */
         int step;
         size_t size;
@@ -581,7 +583,38 @@ template <typename T> StaticMatrix<T> &StaticMatrix<T>::pseudoInverse(const T &n
             lindex += _n + 1;
         }
     }
+    /* The rank value is y == x - current_index */
+    /* Treat the null rank as a special case */
+    if (!y)
+    {
+        delete[] indexes;
+        delete[] V;
+        memset((void*) _data, 0, _n * _m * sizeof(T));
+        int tmp = _n;
+        _n = _m;
+        _m = tmp;
+        return *this;
+    }
+    indexes[current_index] = -1;
+    { /* Initialize the result matrix to some intermediate value */
+        size_t size = _n + _m - y, sqsize = sq(size), cpysize = _m * sizeof(T);
+        result = new T[sqsize];
+        memset((void*) result, 0, sqsize * sizeof(T));
+        int i = 0, j = _m, k = 0, l = 0;
+        while (k < sqsize)
+        {
+            if ((indexes[l] == i) || (i >= _m))
+            {
+                result[k + j++] = 1;
+                ++l;
+            } else {
+                memcpy((void*) &result[k], (void*) &V[(i++) * _m], cpysize);
+            }
+            k += size;
+        }
+    }
     // TODO
+    delete[] indexes;
     delete[] V;
     return *this;
 }
