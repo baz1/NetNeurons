@@ -33,5 +33,5 @@ and does not prevent being stuck in a potential well.
 
 It does therefore **not give good results for the learning phase**.
 You should use another implementation such as the FANN (Fast Artificial Neural Network) library,
-which is well-known, documented, simple, and will have a more accurate learning.
-
+which is well-known, documented, simple, and will have a more accurate learning,
+even though you will probably still encounter those potential well problems.
