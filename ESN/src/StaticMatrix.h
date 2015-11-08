@@ -666,6 +666,7 @@ template <typename T> StaticMatrix<T> &StaticMatrix<T>::pseudoInverse(const T &n
             }
         }
     }
+    delete[] _data;
     /* Allocate and initialize the right-hand matrix */
     T *Rm;
     {
@@ -698,9 +699,26 @@ template <typename T> StaticMatrix<T> &StaticMatrix<T>::pseudoInverse(const T &n
                 Rm[index + j] = V[index2 -= _m];
         }
     }
-    // TODO
     delete[] indexes;
     delete[] V;
+    /* Invert Rm */
+    // TODO invert Lm (row operations), with result and Rm
+    delete[] Lm;
+    /* Invert Rm */
+    // TODO invert Rm (0 at the top, I_{_m-y} at the bottom, row op.), with result
+    delete[] Rm;
+    /* Extract the pseudo-inverse from the result matrix */
+    _data = new T[_n * _m];
+    {
+        int index = 0, index2 = 0;
+        size_t rsize = _m * sizeof(T);
+        for (int i = 0; i < _n; index += _m, index2 += size, ++i)
+            memcpy((void*) &_data[index], (const void*) &result[index2], rsize);
+        index = _n;
+        _n = _m;
+        _m = index;
+    }
+    delete[] result;
     return *this;
 }
 
