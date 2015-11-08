@@ -667,7 +667,37 @@ template <typename T> StaticMatrix<T> &StaticMatrix<T>::pseudoInverse(const T &n
         }
     }
     /* Allocate and initialize the right-hand matrix */
-    T *Rm = new T[size * (_m - y)];
+    T *Rm;
+    {
+        int sizeN = _m - y;
+        Rm = new T[size * sizeN];
+        int min_q, max_q = 0, index = 0, index2;
+        for (int k = 0; k <= current_index; ++k)
+        {
+            min_q = max_q;
+            max_q = indexes[k];
+            for (int q = min_q; q < max_q; index += sizeN, ++q)
+            {
+                index2 = (m - r + y) * _m + q;
+                for (int j = m - r; --j >= 0;)
+                    Rm[index + j] = V[index2 -= _m];
+            }
+            if (k < current_index)
+                memset((void*) &Rm[index], 0, sizeN * sizeof(T));
+        }
+        if (_n > x)
+        {
+            index2 = (_n - x) * sizeN;
+            memset((void*) &Rm[index], 0, index2 * sizeof(T));
+            index += index2;
+        }
+        for (int q = n; q < size; index += sizeN, ++q)
+        {
+            index2 = (m - r + y) * _m + y + q - _n;
+            for (int j = m - r; --j >= 0;)
+                Rm[index + j] = V[index2 -= _m];
+        }
+    }
     // TODO
     delete[] indexes;
     delete[] V;
