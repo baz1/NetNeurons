@@ -617,6 +617,7 @@ template <typename T> StaticMatrix<T> &StaticMatrix<T>::pseudoInverse(const T &n
             k += size;
         }
     }
+    indexes[current_index] = y;
     /* Allocate and initialize the left-hand matrix */
     T *Lm;
     {
@@ -627,7 +628,43 @@ template <typename T> StaticMatrix<T> &StaticMatrix<T>::pseudoInverse(const T &n
         int c = _n * step;
         while (c)
             Lm[c -= step] = 1;
-        // TODO
+        int min_q, max_q = 0, index, iadd, index2;
+        for (int k = 0; k < current_index; iadd += _n, ++k)
+        {
+            min_q = max_q;
+            max_q = indexes[k];
+            for (int p = current_index - 1; p >= k; --p)
+            {
+                index2 = indexes[p] + p;
+                index = min_q * _n + index2;
+                index2 = index2 * _n + k + min_q;
+                for (int q = min_q; q < max_q; index += _n, ++index2, ++q)
+                {
+                    T value = _data[index];
+                    Lm[index + iadd] = value;
+                    Lm[index2] = -value;
+                }
+            }
+        }
+        for (int k = _m - y - 1; k >= current_index; --k)
+        {
+            max_q = 0;
+            iadd = 0;
+            int sindex = (x + k - current_index) * _n;
+            for (int p = 0; p <= current_index; iadd += _n, ++p)
+            {
+                min_q = max_q;
+                max_q = indexes[p];
+                index = min_q * _n + x + k - current_index;
+                index2 = sindex + min_q + p;
+                for (int q = min_q; q < max_q; index += _n, ++index2, ++q)
+                {
+                    T value = _data[index];
+                    Lm[index + iadd] = value;
+                    Lm[index2] = value;
+                }
+            }
+        }
     }
     /* Allocate and initialize the right-hand matrix */
     T *Rm = new T[size * (_m - y)];
