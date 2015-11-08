@@ -13,7 +13,6 @@
 
 #define MATRIX_MEM_CMP 0
 
-#include <QtGlobal>
 #ifdef QT_VERSION /* Are we using Qt? */
   #include <QtGlobal>
   #define ASSERT(x) Q_ASSERT(x)
@@ -596,9 +595,10 @@ template <typename T> StaticMatrix<T> &StaticMatrix<T>::pseudoInverse(const T &n
         return *this;
     }
     indexes[current_index] = -1;
+    size_t size = _n + _m - y;
     {
         /* Initialize the result matrix to some intermediate value */
-        size_t size = _n + _m - y, sqsize = sq(size), cpysize = _m * sizeof(T);
+        size_t sqsize = sq(size), cpysize = _m * sizeof(T);
         result = new T[sqsize];
         memset((void*) result, 0, sqsize * sizeof(T));
         int i = 0, j = _m, k = 0, l = 0;
@@ -616,10 +616,21 @@ template <typename T> StaticMatrix<T> &StaticMatrix<T>::pseudoInverse(const T &n
             }
             k += size;
         }
-        /* Allocate and initialize the right-hand matrix */
-        T *Rm = new T[size * (_m - y)];
+    }
+    /* Allocate and initialize the left-hand matrix */
+    T *Lm;
+    {
+        size_t sqsize = _n * _n;
+        Lm = new T[sqsize];
+        memset((void*) Lm, 0, sqsize * sizeof(T));
+        int step = _n + 1;
+        int c = _n * step;
+        while (c)
+            Lm[c -= step] = 1;
         // TODO
     }
+    /* Allocate and initialize the right-hand matrix */
+    T *Rm = new T[size * (_m - y)];
     // TODO
     delete[] indexes;
     delete[] V;
